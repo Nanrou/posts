@@ -2,7 +2,7 @@
 
 ## 关于元类
 
-99%情况下都不需要用这个，暂时来讲知道这个特性主要由__new__方法实现就行了。
+99%情况下都不需要用这个，暂时来讲知道这个特性主要由 __ new __ 方法实现就行了。
 
 ## 节约内存
 
@@ -10,11 +10,11 @@
 
 ## 上下文管理
 
-关于上下文管理，也就是在class中设置__enter__,__exit__属性，这样就可以配合with使用了。也就是说，在with这个块中，无论如何都会执行exit方法。
+关于上下文管理，也就是在class中设置 __ enter __ ， __ exit __ 属性，这样就可以配合with使用了。也就是说，在with这个块中，无论如何都会执行exit方法。
 
-在设置__enter__属性时，要注意返回的对象是不是self，一般来说都是。
+在设置 __ enter __ 属性时，要注意返回的对象是不是self，一般来说都是。
 
-在设置__exit__属性时，要注意接收的参数， def __exit__(self,exc_type,exc_val,exc_tab)，需要接收异常信息。
+在设置 __ exit __ 属性时，要注意接收的参数， def  __ exit __ (self,exc_type,exc_val,exc_tab)，需要接收异常信息。
 
 注意，如果在exit中设置了return Ture。则错误会被包在with中而不传回给最上层。
 
@@ -28,7 +28,7 @@ property，staticmethod， classmethod这三兄弟是使用在类中的特殊方
 
 ## 定义比较运算符
 
-类与类之所以能够相互比较，就是因为实现了__lt__,__le__,__gt__,__ge__,__eq__,__ne__这些magic method。实际进行比较，就等于是调用这些方法。我们当然可以全部实现这6个方法，不过也可以调用functools.total_ordering这个方法，将其作为装饰器，装饰整个类，然后只用实现__lt__和__eq__就可以实现6个属性的比较了。
+类与类之所以能够相互比较，就是因为实现了 __ lt __ , __ le __ , __ gt __ , __ ge __ , __ eq __ , __ ne __ 这些magic method。实际进行比较，就等于是调用这些方法。我们当然可以全部实现这6个方法，不过也可以调用functools.total_ordering这个方法，将其作为装饰器，装饰整个类，然后只用实现 __ lt __ 和 __ eq __ 就可以实现6个属性的比较了。
 
 ```python
 from functools import total_ordering

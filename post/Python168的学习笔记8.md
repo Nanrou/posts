@@ -37,7 +37,7 @@ def climb(n,steps):  # steps=[a, b+1]范围
 
 ## 装饰器对原函数的影响
 
-关于函数的元数据，如：f.__name__,指的是def时指定的名字；f.__doc__,指的是函数文档字符串；f.__moudle__,指的是函数所属模块;f.__default__,指的是函数默认值；f.__dict__,指的是属性字典；f.__closure__,指的是函数的闭包。。。这些元数据都是func的属性。
+关于函数的元数据，如：f. __ name __ ,指的是def时指定的名字；f. __ doc __ ,指的是函数文档字符串；f. __ moudle __ ,指的是函数所属模块;f. __ default __ ,指的是函数默认值；f. __ dict __ ,指的是属性字典；f. __ closure __ ,指的是函数的闭包。。。这些元数据都是func的属性。
 
 使用装饰器会改变func的元数据。有三种方法将其改回来，当然推荐用的是wraps。
 
@@ -197,4 +197,4 @@ for _ in xrange(10):
     sleep(choice([0.5,1,1.5]))
 ```
 
-在fluent python中，推荐是通过类的__call__方法来实现装饰器功能。
+在fluent python中，推荐是通过类的 __ call __ 方法来实现装饰器功能。
