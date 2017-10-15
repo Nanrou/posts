@@ -1,5 +1,6 @@
 from queue import LifoQueue
 from copy import deepcopy
+import time
 
 
 def block(matrix, pos):
@@ -87,64 +88,41 @@ def queen_one(n, cur=0):
 """
 
 
-def knight_travel(n=8):
+def knight_travel(n=5, start=(2, 2)):
     assert int(n) > 4
+    dirs = [(-1, -2), (1, -2), (-2, -1), (2, -1), (-2, 1), (2, 1), (-1, 2), (1, 2)]
 
+    def mark(maze, pos):  # 标记该位
+        maze[pos[0]][pos[1]] = 1
+
+    def possible(maze, pos):  # 判断合法性
+        if -1 < pos[0] < n and -1 < pos[1] < n and maze[pos[0]][pos[1]] == 0:
+            return True
+        return False
+
+    def done(maze):  # 判断是否已结束
+        return all(all(_i == 1 for _i in row) for row in maze)
+
+    _maze = [[0 for _ in range(n)] for _ in range(n)]
     stack = LifoQueue()
-    travel_list = []
-    travel_matrix = [[0 for _ in range(n)] for _ in range(n)]
-
-    def next_coord(pos):
-        length = n
-        i, j = pos
-        assert -1 < i < length
-        assert -1 < j < length
-
-        if i - 2 > -1:
-            if j - 1 > -1:
-                yield (i - 2, j - 1)
-            if j + 1 < length:
-                yield (i - 2, j + 1)
-
-        if i + 2 < length:
-            if j - 1 > -1:
-                yield (i + 2, j - 1)
-            if j + 1 < length:
-                yield (i + 2, j + 1)
-
-        if j - 2 > -1:
-            if i - 1 > -1:
-                yield (i - 1, j - 2)
-            if i + 1 < length:
-                yield (i + 1, j - 2)
-
-        if j + 2 < length:
-            if i - 1 > -1:
-                yield (i - 1, j + 2)
-            if i + 1 < length:
-                yield (i + 1, j + 2)
-
-    i, j = 0, 4
-    stack.put((list(travel_list), (i, j)))
+    mark(_maze, start)
+    stack.put((deepcopy(_maze), start, 0))
     while not stack.empty():
-        _travel_list, pos = stack.get()
-        _travel_list.append(pos)
-        # _travel_matrix, pos = stack.get()
-        # travel_list.append(pos)
-        print(len(_travel_list))
-        if len(_travel_list) == n * n:
-            print('success')
-            print(_travel_list)
-            break
-
-        for item in next_coord(pos):
-            if item in _travel_list:
-                continue
-            else:
-                stack.put((list(_travel_list), item))
+        _maze, _pos, nxt = stack.get()
+        for i in range(nxt, len(dirs)):
+            nextp = (_pos[0] + dirs[i][0], _pos[1] + dirs[i][1])
+            if done(_maze):
+                print(stack.queue)  # 栈中存储的就是答案，之前的做法应该没错，只是要太长时间了，这个运行了70000+次
+                print('done')
+                return
+            if possible(_maze, nextp):
+                stack.put((deepcopy(_maze), _pos, i + 1))
+                mark(_maze, nextp)
+                stack.put((deepcopy(_maze), nextp, 0))
+                break
     else:
-        print('fail')
-
+        print(_maze)
+        print('false')
 
 
 if __name__ == '__main__':
@@ -153,4 +131,4 @@ if __name__ == '__main__':
     #    print(line)
     # queen_one([None]*8)
     # queen()
-    knight_travel()
+    knight_travel(5)
