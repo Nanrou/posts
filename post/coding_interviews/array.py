@@ -60,7 +60,7 @@ def find_duplication_1(numbers):
             while nums[i] != i:
                 if nums[i] == nums[nums[i]]:
                     return nums[i]
-                # nums[i], nums[nums[i]] = nums[nums[i]], nums[i]  不可以这么写，会错误
+                # nums[i], nums[nums[i]] = nums[nums[i]], nums[i]  不可以这么写，因为nums[nums[i]]会变
                 tmp = nums[i]
                 nums[i] = nums[tmp]
                 nums[tmp] = tmp
@@ -186,6 +186,30 @@ def find_exist_in_matrix(matrix, num):
         else:
             row += 1
     return False
+	
+
+def find_min_in_rorate(lst):  # 普通情况，0偏移情况，有重复元素情况
+	if len(lst) > 1:
+		start, end = 0, len(lst) - 1
+		while lst[start] >= lst[end]:
+			if end - start == 1:
+				return lst[end]
+			mid = (start + end) // 2
+			if lst[mid] == lst[start]:
+				break
+			elif lst[mid] > lst[start]:
+				start = mid
+			else:
+				end = mid	
+		else:
+			return lst[start]
+			
+		_min = 0
+		for i in lst
+			_min = min(_min, i)
+		return _min
+	else:
+		return lst
 
 
 if __name__ == '__main__':
