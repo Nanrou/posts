@@ -210,6 +210,17 @@ def find_min_in_rotate(lst):  # 普通情况，0偏移情况，有重复元素�
     else:
         return lst
 
+        
+def sort_odd_and_even(lst):
+    i, j = 0, len(lst) - 1
+    while i < j:
+        while i < j and lst[j] & 0b1 == 0:
+            j -= 1
+        while i < j and lst[i] & 0b1 != 0:
+            i += 1
+        if i < j:
+            lst[i], lst[j] = lst[j], lst[i]
+
 
 if __name__ == '__main__':
     import doctest

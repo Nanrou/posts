@@ -3,6 +3,7 @@
 """
 
 from queue import LifoQueue, Queue
+from itertools import product
 
 
 class MyQueue:
@@ -65,6 +66,16 @@ def climb_stairs(n):
 
 
 def sort_age1(lst):
+    """    
+    from random import randint
+
+    bb = []
+    for _ in range(12):
+        bb.append(randint(18, 70))
+    print(bb)
+    print(sort_age1(bb))
+    print(sort_age2(bb))
+    """
     if len(lst) > 1:
         times_of_age = []
         for _ in range(18, 71):
@@ -100,13 +111,91 @@ def sort_age2(lst):  # 基数排序，时间复杂度为O(d*(n+k))，d是关键�
     else:
         return lst
 
+def cut_the_rope(lenght):
+    if lenght < 2: return 0
+    if lenght == 2: return 1
+    if lenght == 3: return 2
+    
+    factor_list = [0, 1, 2, 3]
+    for i in range(4, lenght + 1):
+        factor_list.append(0)
+        for j in range(1, i // 2 + 1):
+            factor_list[i] = max(factor_list[i], factor_list[j] * factor_list[i - j])
+    return factor_list[-1]
+    
 
+def count_how_many_one1(num):
+    count = 0
+    while num > 0:
+        num = (num - 1) & num
+        count += 1
+    return count
+    
+def count_how_many_one2(num):
+    count, flag = 0, 1
+    while flag < num:
+        if num & flag:
+            count += 1
+        flag = flag << 1  # 增大比较位而不是右移输入
+    return count
+    
+def my_pow(base, exponent):  # 只支持整数
+    if base == 0 and exponent < 0:
+        raise RuntimeError
+    def pow_core(base, unsign_exponent):
+        if unsign_exponent == 0:
+            return 1
+        if unsign_exponent == 1:
+            return base
+        res = pow_core(base, unsign_exponent >> 1)  # 划分成两部分
+        res *= res  # 这两部分乘回来
+        if unsign_exponent & 0b1:  # 若指数为奇数，这里补上那一次
+            res *= base
+        return res  
+            
+    if exponent < 0:
+        return 1 / pow_core(base, abs(exponent))
+    else:
+        return pow_core(base, exponent)
+        
+        
+def print_range_number(n):  # 就是输出全排列
+    base_list = [i for i in range(10)]
+    ll = []
+    for _ in range(n):
+        ll.append(base_list)
+    for ele in product(*ll):
+        print(int(''.join([str(e) for e in ele])))
+            
+
+
+def is_match(s, p):  # p是带有正则表达式的字符串。中心思想在于*单独出现是没有意义的，它前面必定跟着一个字符。
+    if len(p) is 0:  # 临界条件 
+        return len(s) is 0 
+    
+    if len(p) is 1:  # 临界条件
+        return len(s) is 1 and (p is '.' or p is s)
+        
+    if p[1] is '*':  # 若p[1]位置为*
+        if is_match(s, p[2:]):  # 看现在剩下的匹配规则部分与字符串的是否相等，这是假设*所带的字符没出现
+            return True
+        else:
+            return len(s) > 0 and \
+                (p[0] is '.' or p[0] is s[0]) and \
+                is_match(s[1:], p)  # 第二行是要比较那个s的字符是否符合规则， s逐渐向右边靠，也就是逐渐减掉*所带的字符
+    else:  # 一般情况，逐个比较字符，然后逐渐缩小问题的规模
+        return len(s) > 0 and \
+                (p[0] is '.' or p[0] is s[0]) and \
+                is_match(s[1:], p[1:])   
+
+from string import digits
+from re import match
+
+def is_numeric(strings):  # A[.B][e|EC] 或者 .B[e|EC]  其中AC是可以有符号的，B不可以有
+    if match('([\+-]?\d+(\.\d*)?|\.\d+)([eE][\+-]?\d+)?', strings):
+        return True
+    else:
+        return False
+    
 if __name__ == '__main__':
-    from random import randint
-
-    bb = []
-    for _ in range(12):
-        bb.append(randint(18, 70))
-    print(bb)
-    print(sort_age1(bb))
-    print(sort_age2(bb))
+    print(is_numeric('+1e-12'))
