@@ -220,6 +220,9 @@ def sort_odd_and_even(lst):
             i += 1
         if i < j:
             lst[i], lst[j] = lst[j], lst[i]
+            
+            
+            
 
 
 if __name__ == '__main__':

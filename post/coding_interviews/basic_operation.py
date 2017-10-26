@@ -88,16 +88,16 @@ def preorder_recursion(node, proc):
 def inorder_recursion(node, proc):
     if node is None:
         return
-    preorder_recursion(node.left, proc)
+    inorder_recursion(node.left, proc)
     proc(node.data)
-    preorder_recursion(node.right, proc)
+    inorder_recursion(node.right, proc)
 
 
 def postorder_recursion(node, proc):
     if node is None:
         return
-    preorder_recursion(node.left, proc)
-    preorder_recursion(node.right, proc)
+    postorder_recursion(node.left, proc)
+    postorder_recursion(node.right, proc)
     proc(node.data)
 
 
@@ -186,8 +186,7 @@ def quick_sort(num_list):  # 主函数
         return num_list
 
 
-def quick_sort1(
-        num_list):  # 同样也是用基准值去比较，但不是向上面那样，左右两边向中间逼近，而是大小区间都在左边，逐渐覆盖到右边。因为右边本来就是比较大的，所以只用处理较小的元素：每当找到小的元素（它现在在较大的最右），将这个元素与下标为i的对调，因为下标i就是最小的最右
+def quick_sort1(num_list):  # 同样也是用基准值去比较，但不是向上面那样，左右两边向中间逼近，而是大小区间都在左边，逐渐覆盖到右边。因为右边本来就是比较大的，所以只用处理较小的元素：每当找到小的元素（它现在在较大的最右），将这个元素与下标为i的对调，因为下标i就是最小的最右
     def qsort(lst, start, end):
         if start >= end:
             return
@@ -198,7 +197,7 @@ def quick_sort1(
                 i += 1
                 lst[i], lst[j] = lst[j], lst[i]
         lst[start], lst[i] = lst[i], lst[start]
-
+        
         qsort(lst, start, i - 1)
         qsort(lst, i + 1, end)
 
@@ -271,5 +270,5 @@ def merge_sort(lst):
 
 if __name__ == '__main__':
     ll = [7, 5, 8, 11, 66, 2, 4, 33]
-    bubble_sort(ll)
+    quick_sort1(ll)
     print(ll)

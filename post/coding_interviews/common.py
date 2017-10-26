@@ -196,6 +196,94 @@ def is_numeric(strings):  # A[.B][e|EC] 或者 .B[e|EC]  其中AC是可以有符
         return True
     else:
         return False
+        
+def print_matrix_clock_wisely(matrix):
+    """
+    n = 1
+    bb = []
+    for i in range(n):
+        bb.append([])
+        for j in range(n):
+            bb[i].append(j + i * n + 1)
+    for b in bb:
+        print(b)
+    print_matrix_clock_wisely(bb)
+    """
+    if matrix is None or (not len(matrix) and not len(matrix)):
+        raise RuntimeError('invalid matrix')
+        
+    rows, cols = len(matrix), len(matrix[0])
+    start = 0
     
+    while rows > start * 2 and cols > start *2:
+    
+        for col in range(start, cols - start):
+            print(matrix[start][col], end=" ")
+        if start + 1 < rows:
+            for row in range(start + 1, rows - start):
+                print(matrix[row][col], end=" ")
+            if start + 2 < cols: 
+                for col in range(cols - 2 - start, start - 1, -1):
+                    print(matrix[row][col], end=" ")
+                if start + 2 < rows:
+                    for row in range(rows - 2 - start, start, -1):
+                        print(matrix[row][col], end=" ")
+                        
+        start += 1
+
+        
+class MinStack:  # 用了一个辅助栈存放最小元素
+    """
+    ss = MinStack()
+    for i in [2, 5, 1, 3, 0, 7]:
+        ss.put(i)
+    print(ss.min_ele)
+    """
+    def __init__(self):
+        self.stack = LifoQueue()
+        self.min_stack = LifoQueue()
+        
+    def put(self, ele):
+        if self.min_stack.empty():    
+            self.min_stack.put(ele)
+        else:
+            self.min_stack.put(min(self.min_stack.queue[-1], ele))
+        self.stack.put(ele)
+    
+    def get(self):
+        if self.stack.empty():
+            raise RuntimeError('stack is empty')
+        self.min_stack.get()
+        return self.stack.get()
+
+    @property    
+    def min_ele(self):
+        if self.min_stack.empty():
+            raise RuntimeError('stack is empty')
+        return self.min_stack.queue[-1]
+
+
+def push_seq_and_pop_seq(push_seq, pop_seq):  # 用一个栈来模拟出入栈，一直比较栈顶元素是否能对应上弹出元素就可以了
+    if len(push_seq) == 0 or len(push_seq) != len(pop_seq):
+        raise RuntimeError
+    
+    stack = LifoQueue()
+    push_index = pop_index = 0
+    while push_index <= len(push_seq):
+        if not stack.empty() and stack.queue[-1] == pop_seq[pop_index]:
+            pop_index += 1
+            stack.get()
+            if push_index == pop_index == len(push_seq):
+                return True
+            continue
+        stack.put(push_seq[push_index])
+        push_index += 1
+    return False
+
+def permutations_chr(lst):  # 直接用内置的排列生成器
+    from itertools import permutations
+    return list(permutations(lst))
+        
+        
 if __name__ == '__main__':
-    print(is_numeric('+1e-12'))
+    print(push_seq_and_pop_seq([1, 2, 3, 4, 5], [4, 5, 3, 2, 1]))

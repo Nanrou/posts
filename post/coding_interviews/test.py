@@ -124,9 +124,83 @@ def sort_by_some_rule(lst, func):
             i += 1
         if i < j:
             lst[i], lst[j] = lst[j], lst[i]
+            
+def find_more_than_half_num(num_lst):
+    """
+    print(find_more_than_half_num([1, 2, 3, 2, 2, 2, 5, 4, 2]))
+    """
+    if num_lst is None or len(num_lst) == 0:
+        return None
+    if len(num_lst) <= 2:
+        return num_lst[0]
+        
+    def partition(lst, s, e):
+        pivot = lst[s]
+        i = s
+        for j in range(s + 1, end + 1):
+            if lst[j] < pivot:
+                i += 1
+                lst[i], lst[j] = lst[j], lst[i]
+                
+        lst[s], lst[i] = lst[i], lst[s]
+        return i
+               
+    start, end = 0, len(num_lst) - 1
+    mid = (start + end) >> 1
+    index = partition(num_lst, start, end)
+    while index != mid:
+        if index > mid:
+            end = index - 1
+            index = partition(num_lst, start, end)
+        else:
+            start = index + 1
+            index = partition(num_lst, start, end)
+    return num_lst[index]
+  
+def find_more_than_half_num1(num_lst):  # 那个数的出现次数，至少比其他所有数的总出现次数多一次
+    that_num, times = None, 0
+    for i in num_lst:
+        if times == 0:
+            that_num = i
+        elif i == that_num:
+            times += 1
+        else:
+            times -= 1
+    return that_num
+
+
+def find_min_k_num(num_lst, k):
+    if len(num_lst) <= k:
+        return num_lst
+    
+    from random import randint  # 引入随机数会更好的
+    def partition(lst, s, e):
+        if s >= e:
+            return s
+        _index = randint(s, e)
+        lst[s], lst[_index] = lst[_index], lst[s]
+        i = s
+        for j in range(s + 1, e + 1):  # 注意这个范围，end要加1
+            if lst[j] < lst[s]:
+                i += 1  # 要先加1，因为要保证不会移动轴元素
+                lst[i], lst[j] = lst[j], lst[i]
+        lst[s], lst[i] = lst[i], lst[s]
+        return i
+    
+    start, end = 0, len(num_lst) - 1
+    index = partition(num_lst, start, end)
+    while k != index:
+        if index > k:
+            end = index - 1
+            index = partition(num_lst, start, end)
+        else:
+            start = index + 1
+            index = partition(num_lst, start, end)
+    print(num_lst)
+    return num_lst[: k]
+    
 
 if __name__ == '__main__':
     ll = [i for i in range(10)]
-    sort_by_some_rule(ll, conclude_even)
-    print(ll)
+    print(find_min_k_num(ll, 4))
     
