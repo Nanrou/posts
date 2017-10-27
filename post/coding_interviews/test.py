@@ -199,8 +199,11 @@ def find_min_k_num(num_lst, k):
     print(num_lst)
     return num_lst[: k]
     
+def find_min_k_num1(num_lst, k):  # 用堆来存放最小的k项
+    from heapq import nsmallest 
+    return nsmallest(k, num_lst)
 
 if __name__ == '__main__':
     ll = [i for i in range(10)]
-    print(find_min_k_num(ll, 4))
+    print(find_min_k_num1(ll, 4))
     

@@ -281,9 +281,197 @@ def push_seq_and_pop_seq(push_seq, pop_seq):  # 用一个栈来模拟出入栈�
     return False
 
 def permutations_chr(lst):  # 直接用内置的排列生成器
+    """
+    print(push_seq_and_pop_seq([1, 2, 3, 4, 5], [4, 5, 3, 2, 1]))
+    """
     from itertools import permutations
     return list(permutations(lst))
+
+def greatest_sum_of_subarry(num_lst):  # 动态规划，这里的判断不是取不取当前这个，而是要不要之前那些。如果之前那些为负数，则从现在重新开始（因为会让和比现在这个数还要小，跟我们想要的最大和不符），否则就叠加之前的。这里又要维持一个最大值的变量，因为最大值不一定出现在最后。
+    """
+    print(greatest_sum_of_subarry([1, -2, 3, 10, -4, 7, 2, -5]))
+    """
+    curr = sum = 0
+    for i in range(len(num_lst)):
+        if i == 0:  # 初始情况
+            curr = num_lst[i]
+            continue
+        if curr < 0:  # 之前的和为负数的话，就重新开始累加
+            curr = num_lst[i]
+        else:
+            curr += num_lst[i]
+            sum = max(curr, sum)
+    return sum
+    
+    
+def count_k_between_n(n, k=1):  #  十进制，也就是说每十个数，k就出现一次。对于个位来讲，有多少组十，就有多少个k，然后再看余数是否小于k，否则就+1。后面都是如此循环
+    """
+    print(count_k_between_n(2593, 5))
+    """
+    _digit = _count = 0
+    while n > k * 10 ** _digit:
+        print('{} time'.format(_digit))
+        _digit += 1
+        _group = n // 10 ** _digit
+        _count += _group * 10 ** (_digit -  1)
+        _mod = n % 10 ** _digit // 10 ** (_digit - 1)
+        if _mod > k:
+            _count += 10 ** (_digit - 1)
+        elif _mod == k:
+            _count += n % 10 ** (_digit - 1) + 1
+    return _count
+    
+def digit_at_index(index):  # 找到内在规律，就是前十位是个位数，之后的180位里都是两位数，如此类推。
+    """
+    print(digit_at_index(1001))
+    """
+    if index < 0:
+        return None
+    if index < 10:
+        return index
+    
+    _digit = 2
+    index -= 10
+    while True:
+        print(index)
+        _group = _digit * 9 * 10 ** (_digit - 1)
+        if index <= _group:
+            _i = index // _digit  # 得出是这个区间的第几个数字
+            _mod = index % 10  # 看是这个数字的第几位
+            _num = 10 ** (_digit - 1) + _i  # 拿到这个数字
+            return _num // 10 ** (_digit - 1 - _mod)  % 10  # 等于是要求一个n位数num的第m位是多少，左边第一位为0。m = num // 10 ** (n-m) % 10
+        index -= _group
+        _digit += 1
         
         
+def find_min_number_combine(num_lst):  # 全排之后比较需要n!，动态规划需要n^2。问题本质是，对于元素m和n，是nm小还是mn小，若是nm小，则n在m前面，相反同理。那么问题就可以转换成排序问题了，只不过这个排序的规则不再是比较元素数值的大小，而是比较它们组合成的数字的大小。可以用快排的思想，将比较规则改一下就可以了。
+    """
+    print(find_min_number_combine([3, 32, 321]))
+    """
+    if num_lst is None or len(num_lst) == 0: return None
+    if len(num_lst) == 1: return num_lst[0]
+    
+    from random import randint
+    def sort_core(lst, s, e):
+        if s >= e:
+            return
+        _index = randint(s, e)
+        lst[s], lst[_index] = lst[_index], lst[s]
+        i = s
+        for j in range(s + 1, e + 1):
+            a = int(''.join([str(lst[s]), str(lst[j])]))
+            b = int(''.join([str(lst[j]), str(lst[s])]))
+            if b < a:
+                i += 1
+                lst[i], lst[j] = lst[j], lst[i]
+        lst[s], lst[i] = lst[i], lst[s]
+        sort_core(lst, s, i - 1)
+        sort_core(lst, i + 1, e)
+    
+    sort_core(num_lst, 0, len(num_lst) - 1)
+    return int(''.join([str(i) for i in num_lst]))
+
+def transform_num_to_str(num):  # 用了f2 = f0 + f1 的递归思想，注意深拷贝的应用
+    """
+    print(transform_num_to_str(12258))
+    """
+    if num < 0:
+        raise RuntimeError
+        
+    from string import ascii_lowercase
+    map_dict = {str(index): char for index, char in enumerate(ascii_lowercase)}
+    
+    from copy import deepcopy
+    num_str = str(num)
+    f0 = [[]]
+    for index, _num in enumerate(num_str):
+        if index == 0:
+            f1 = [[_num]]
+            continue
+        _f1 = deepcopy(f1)  
+        for f in f1:
+            f.append(_num)
+        if 9 < int(num_str[index - 1] + num_str[index]) < 26:
+            for f in f0:
+                f.append(num_str[index - 1] + num_str[index])
+            f2 = f1 + f0
+        else:
+            f2 = f1
+        f0, f1 = deepcopy(_f1), deepcopy(f2)        
+
+    return [''.join([map_dict[i] for i in s]) for s in f2]
+
+
+def get_max_value_in_chessboard(matrix):  # 类似背包问题，可以做出一个最优表，也就是可以用一维数组来保存。
+    """
+    mm = [[1, 10, 3, 8], [12, 2, 9, 6], [5, 7, 4, 11], [3, 7, 16, 5]] 
+    get_max_value_in_chessboard(mm)
+    """
+    if len(matrix) == 0 or len(matrix[0]) == 0:
+        raise RuntimeError
+    rows, cols = len(matrix), len(matrix[0])
+    res = [None] * cols  # 用一维数组来存放结果
+    
+    for row in range(rows):
+        for col in range(cols):
+            _left = res[col - 1] if col > 0 else 0
+            _up = res[col] if row > 0 else 0
+            res[col] = max(_left, _up) + matrix[row][col]
+            
+    print(res[col])
+    
+def get_longest_unique_strings(strings):  # 用一个hash表来存放出现过的字符的位置，方便出现重复的时候更新当前字符串。curr保存着现阶段的不重复字符串，有更长的话就更新到max_中去
+    """
+    print(get_longest_unique_strings('arabcacfr'))
+    """
+    
+    if len(strings) < 2:
+        return strings
+
+    from string import ascii_lowercase
+    map_dict = {char: -1 for char in ascii_lowercase}
+        
+    s, e = 0, 1
+    max_ = curr = strings[s: e]
+    map_dict[strings[0]] = 0
+    for index, char in enumerate(strings[1:], start = 1):
+        if char in curr:
+            s = map_dict[char] + 1
+        e = index
+        curr = strings[s: e + 1]
+        map_dict[char] = index
+        
+        if len(curr) >= len(max_):  # 若有相同长度，则优先返回后面的
+            max_ = curr
+    return max_    
+
+def find_nth_ugly_num(n):  # 取巧了，第i个数，必定是由前面某个数乘2或3或5得出来的。
+    from itertools import cycle
+    assert n > 0
+    ugly_lst = [0, 1, 2, 3, 4, 5]
+    if n < 6 : return ugly_lst[n]
+    
+    tt_list = [3, 3, 3]
+    cc = cycle((0, 1, 2))
+    while len(ugly_lst) != n + 1:
+        tmp = []
+        for t in (ugly_lst[tt_list[0]] * 2, ugly_lst[tt_list[1]] * 3, ugly_lst[tt_list[2]] * 5):
+            if t > ugly_lst[-1]:  # 取比最后一项大的数中的最小
+                tmp.append(t)
+        if tmp:
+            next_num = min(tmp)
+            ugly_lst.append(next_num)
+            if next_num % 2 == 0:
+                tt_list[0] += 1
+            elif next_num % 3 == 0:
+                tt_list[1] += 1
+            else:
+               tt_list[2] += 1
+        else:
+            i = next(cc)
+            tt_list[i] += 1  
+    return ugly_lst[-1]
+    
+
 if __name__ == '__main__':
-    print(push_seq_and_pop_seq([1, 2, 3, 4, 5], [4, 5, 3, 2, 1]))
+    print(find_nth_ugly_num(15))
