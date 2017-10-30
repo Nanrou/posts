@@ -446,6 +446,9 @@ def get_longest_unique_strings(strings):  # 用一个hash表来存放出现过�
     return max_    
 
 def find_nth_ugly_num(n):  # 取巧了，第i个数，必定是由前面某个数乘2或3或5得出来的。
+    """
+    print(find_nth_ugly_num(15))
+    """
     from itertools import cycle
     assert n > 0
     ugly_lst = [0, 1, 2, 3, 4, 5]
@@ -472,6 +475,115 @@ def find_nth_ugly_num(n):  # 取巧了，第i个数，必定是由前面某个�
             tt_list[i] += 1  
     return ugly_lst[-1]
     
+def find_first_char_appear_once(strings):  # 直接哈希表来记录出现次数
+    """
+    print(find_first_char_appear_one_time('google'))
+    """
+    from collections import OrderedDict
+    _map = OrderedDict()
+    for char in strings:
+        _map.setdefault(char, 0)
+        _map[char] += 1
+    
+    for k, v in _map.items():
+        if v == 1:
+            return k
+            
+def inverse_pairs(lst):
+    """
+    print(inverse_pairs([7, 5, 6, 4]))
+    """
+    if not lst: return None
+    if len(lst) == 1: return 0
+    
+    _count = 0
+    
+    def merge(lfrom, lto, low, mid, high):
+        nonlocal _count
+        i, j, k = low, mid, low
+        while i < mid and j < high:
+            if lfrom[i] > lfrom[j]:
+                _count += high - j  # 注意理解这一步，因为左右都是已经排序的了，若左边i的比右边j大，则意味着，j的左边都是比i小的，所以逆序对数为high - j
+                lto[k] = lfrom[j]
+                j += 1
+            else:
+                lto[k] = lfrom[i]
+                i += 1
+            k += 1
+            
+        while i < mid:
+            lto[k] = lfrom[i]
+            i += 1
+            k += 1
+        while j < high:
+            lto[k] = lfrom[j]
+            j += 1
+            k += 1
+            
+    def merge_pass(lfrom, lto, llen, slen):
+        i = 0
+        while i + 2 * slen < llen:
+            merge(lfrom, lto, i, i + slen, i + 2 * slen)
+            i += 2 * slen
+        if i + slen < llen:
+            merge(lfrom, lto, i, i + slen, llen)
+        else:
+            for j in range(i, len(llen)):
+                lto[j] = lfrom[j]
+                
+    def merge_main(lst):
+        _assist = [None] * len(lst)
+        slen, llen = 1, len(lst)
+        while slen < llen:
+            merge_pass(lst, _assist, llen, slen)
+            slen *= 2
+            merge_pass(_assist, lst, llen, slen)
+            slen *= 2
+    merge_main(lst)
+    return lst,  _count
+
+    
+def count_number(lst, k):
+    """
+    print(count_number([1, 2, 3, 3, 3, 3, 4, 5], 3))
+    """
+    return lst.count(k)
+    
+    
+def find_miss_ele(lst):  # 注意是要看左边
+    """
+    print(find_miss_ele([1, 2, 3, 4, 5, 6]))
+    """
+    start, end = 0, len(lst) - 1
+    
+    while start <= end:
+        mid = (start + end) >> 1
+        if mid == lst[mid]:  # 边界必定是在相等元素的右边
+            start = mid + 1
+        else:
+            if mid - 1 == lst[mid - 1] or mid == 0:
+                return mid
+            end = mid - 1
+    return None
+    
+    
+def find_ele_equal_its_sub(lst):
+    start, end = 0, len(lst) - 1
+    while start <= end:  # 二分是要有等号的
+        mid = (start + end) >> 1
+        if mid == lst[mid]:
+            return mid
+        if lst[mid] > mid:
+            end = mid - 1
+        else:
+            start = mid + 1
+    return None        
+    
+    
+    
+            
+            
 
 if __name__ == '__main__':
-    print(find_nth_ugly_num(15))
+    print(find_ele_equal_its_sub([-1, 1, 3, 4, 5, 6]))
+    

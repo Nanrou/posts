@@ -31,11 +31,39 @@ def product_loop_linked_list(val_list=[5, 2, 4, 0, 8]):
     p.next = loop_entry
     return dummy.next
     
+def product_common_node_linked_list():
+    commen_node = ListNode(None)
+    curr = commen_node
+    for i in range(5):
+        n = ListNode(i)
+        curr.next = n
+        curr = n
+        
+    dummy1 = ListNode(None)
+    curr = dummy1
+    for i in range(5, 10):
+        n = ListNode(i)
+        curr.next = n
+        curr = n
+        
+    curr.next = commen_node.next
+    
+    dummy2 = ListNode(None)
+    curr = dummy2
+    for i in range(15, 18):
+        n = ListNode(i)
+        curr.next = n
+        curr = n
+    curr.next = commen_node.next
+    return dummy1.next, dummy2.next
+    
+    
+    
 def print_linked_list(head, t=0, proc=lambda x: print(x, end=" ")):
     p = head
     i = 0
     while p is not None:
-        proc(id(p))
+        proc(p)
         p = p.next
         if t:
             if i > t:
@@ -283,16 +311,74 @@ def transform_tree_to_bothway_linked_list(node):  # 这题不理解。用辅助�
     transform_core(node, curr)
     return dummy.next.next
         
+
+from queue import LifoQueue
         
-def serialize_tree(node):  # 要模拟流输入
-    if node is None:
-        print('$', end=" ")  # 要用流输出
-        return
-    print(node.data, end=" ")
-    serialize_tree(node.left)
-    serialize_tree(node.right)
+def find_first_common_node(node1, node2):  # 利用了两个辅助栈来分别记录两个链表，然后从后往回找
+    """
+    d1, d2 = product_common_node_linked_list()
+    print_linked_list(d1)
+    print_linked_list(d2)
+    d = find_first_common_node(d1, d2)
+    print_linked_list(d)
+    """
+    if node1 is None or node2 is None:
+        return None
+    
+    _stack1 = LifoQueue()
+    _stack2 = LifoQueue()
+    
+    curr1, curr2 = node1, node2
+    
+    for curr, stack in zip([curr1, curr2], [_stack1, _stack2]): 
+        while curr is not None:
+            stack.put(curr)
+            curr = curr.next
+    pre1 = pre2 = None
+    while not _stack1.empty() and not _stack2.empty():
+        _n1, _n2 = _stack1.get(), _stack2.get()
+        if _n1 is not _n2:
+            return pre1
+        pre1, pre2 = _n1, _n2
+        
+def find_first_common_node1(node1, node2):  # 对两个链表进行遍历，找到各自的长度，较长的先出发，往前走n步，n为长度之差，然后较短的也出发，遇到相同的就是公共结点
+    """
+    d1, d2 = product_common_node_linked_list()
+    print_linked_list(d1)
+    print_linked_list(d2)
+    d = find_first_common_node1(d1, d2)
+    print_linked_list(d)
+    """
+    
+    curr1, curr2 = node1, node2
+    llen = [0, 0]
+    
+    for i, curr in enumerate([curr1, curr2]): 
+        while curr is not None:
+            llen[i] += 1
+            curr = curr.next
+            
+    curr1, curr2 = node1, node2  
+    length1, length2 = llen
+
+    if length1 > length2:
+        ll = length1 - length2
+        while ll :
+            curr1 = curr1.next
+            ll -= 1
+    else:
+        ll = length2 - length1
+        while ll :
+            curr2 = curr2.next
+            ll -= 1
+            
+    while curr1 and curr2:
+        if curr1 is curr2:
+            return curr1
+        curr1, curr2 = curr1.next, curr2.next
+            
+    
     
 if __name__ == '__main__':
-    
     
     

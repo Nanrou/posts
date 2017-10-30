@@ -237,6 +237,14 @@ def find_path_in_tree(node, num):
             stack.put((_node.right, _sum + _node.right.data, _new_path))
     if not flag:
         print('not found')
+        
+def serialize_tree(node):  # 要模拟流输入
+    if node is None:
+        print('$', end=" ")  # 要用流输出
+        return
+    print(node.data, end=" ")
+    serialize_tree(node.left)
+    serialize_tree(node.right)
                 
 if __name__ == '__main__':
     
