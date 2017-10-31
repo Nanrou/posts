@@ -200,10 +200,35 @@ def find_min_k_num(num_lst, k):
     return num_lst[: k]
     
 def find_min_k_num1(num_lst, k):  # 用堆来存放最小的k项
-    from heapq import nsmallest 
-    return nsmallest(k, num_lst)
-
-if __name__ == '__main__':
+    """
     ll = [i for i in range(10)]
     print(find_min_k_num1(ll, 4))
+    """
+    from heapq import nsmallest 
+    return nsmallest(k, num_lst)
+    
+def find_two_num_appear_once(num_lst):  # 考察位运算，利用了一个数异或本身为0的性质
+    assert len(num_lst) > 3
+    from functools import reduce
+    flag = reduce(lambda x, y: x ^ y, num_lst)  # 因为有两个数不同，所以最终得出来的数肯定不为1
+    a = reduce(lambda x, y: x ^ y, [num for num in num_lst if num & 1])  # 所以可以根据上面那个数将数组分为两个部分，再分别异或就会剩下那个单独的数了
+    b = reduce(lambda x, y: x ^ y, [num for num in num_lst if not num & 1])
+    return a, b
+    
+def find_one_num_appear_once(num_lst):
+    assert len(num_lst) > 3
+    bit_lst = [0] * 32
+    for num in num_lst:
+        num_in_bit = bin(num).strip('0b').zfill(32)
+        for index, char in enumerate(num_in_bit):
+            bit_lst[index] += int(char)
+    for i in range(len(bit_lst)):
+        bit_lst[i] %= 3
+    return int(''.join([str(bit) for bit in bit_lst]), 2)
+    
+
+
+if __name__ == '__main__':
+    print(find_one_num_appear_once([1, 2, 1, 1]))
+    
     

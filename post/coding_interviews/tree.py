@@ -245,7 +245,49 @@ def serialize_tree(node):  # 要模拟流输入
     print(node.data, end=" ")
     serialize_tree(node.left)
     serialize_tree(node.right)
-                
-if __name__ == '__main__':
     
+def find_kth_in_tree(node, k):
+    """
+    from basic_operation import sorted_bin_tree_root as a_root
+    find_kth_in_tree(a_root, 0)
+    """
+    if node is None: return None
+    inorde = []
+    def inorder_recursion(node):
+        if node is None: return
+        inorder_recursion(node.left)
+        inorde.append(node.data)
+        inorder_recursion(node.right)
+    inorder_recursion(node)
+    if k <= len(inorde):
+        return inorde[k - 1]
+    else:
+        return None
+
+def depth_of_tree(node):  # 第一反应想到的是通过遍历去找到最深的值，但是实现起来有点复杂，用递归会简洁很多。
+    if node is None:  # 空的时候深度为0
+        return 0
+    left = depth_of_tree(node.left)
+    right = depth_of_tree(node.right)
+    return max(left, right) + 1  # 每一层都会使深度加一,然后最大值就是取在这层之前的最大值
+
+def is_balanced_tree(node):  # 也是后序遍历，在递归的时候传递flag和深度  
+    """
+    from basic_operation import sorted_bin_tree_root as a_root
+    print(is_balanced_tree(a_root))
+    """
+    def is_balanced_tree_core(node): 
+        if node is None: return True, 0
+        flag1, left = is_balanced_tree_core(node.left)
+        flag2, right = is_balanced_tree_core(node.right)
+        if flag1 and flag2 and abs(left - right) < 2:
+            return True, max(left, right) + 1
+        else:
+            return False, None
+    
+    return is_balanced_tree_core(node)[0]
+    
+ 
+ 
+if __name__ == '__main__':
     

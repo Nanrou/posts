@@ -568,6 +568,9 @@ def find_miss_ele(lst):  # 注意是要看左边
     
     
 def find_ele_equal_its_sub(lst):
+    """
+    print(find_ele_equal_its_sub([-1, 1, 3, 4, 5, 6]))
+    """
     start, end = 0, len(lst) - 1
     while start <= end:  # 二分是要有等号的
         mid = (start + end) >> 1
@@ -580,10 +583,29 @@ def find_ele_equal_its_sub(lst):
     return None        
     
     
-    
-            
+def min_heater_range(house_lst, heater_lst):   
+    """
+    print(min_heater_range([1, 2, 3], [2]))
+    """
+    min_lst = []
+    for house in house_lst:        
+        start, end = 0, len(heater_lst) - 1
+        min_range = float('inf')  # 最小距离初始化为正无穷大
+        while start <= end:
+            mid = (start + end) >> 1
+            if heater_lst[mid] == house:
+                min_range = 0
+                break
+            if heater_lst[mid] < house:
+                start = mid + 1
+            else:
+                end = mid - 1    
+            min_range = min(abs(heater_lst[mid] - house), min_range)
+        min_lst.append(min_range)
+        
+    return max(min_lst)
             
 
 if __name__ == '__main__':
-    print(find_ele_equal_its_sub([-1, 1, 3, 4, 5, 6]))
+    print(min_heater_range([1, 2, 3], [2]))
     
