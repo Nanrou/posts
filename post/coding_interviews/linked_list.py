@@ -19,12 +19,12 @@ def product_linked_list(val_list=[5, 2, 4, 0, 8]):
         p = n
     return dummy.next
     
-def product_loop_linked_list(val_list=[5, 2, 4, 0, 8]):
+def product_loop_linked_list(val_list=[5, 2, 4, 0, 8], entry_node = 4):
     dummy = ListNode(None)
     p = dummy
-    for i in val_list:
+    for index, i in enumerate(val_list):
         n = ListNode(i)
-        if i == 4:
+        if index == entry_node:
             loop_entry = n
         p.next = n
         p = n
@@ -378,7 +378,23 @@ def find_first_common_node1(node1, node2):  # 对两个链表进行遍历，找�
         curr1, curr2 = curr1.next, curr2.next
             
     
-    
+def last_remaining(node, k):
+    """
+    nn = product_loop_linked_list([0, 1, 2, 3, 4], 0)
+    last_remaining(nn, 3)
+    """
+    curr = ListNode(None)
+    curr.next = node
+    i = 1
+    while curr != curr.next:
+        if i < k:
+            i += 1   
+            curr = curr.next
+        else:
+            curr.next = curr.next.next
+            i = 1
+    else:
+        print(curr)
+
 if __name__ == '__main__':
-    
     

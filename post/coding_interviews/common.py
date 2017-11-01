@@ -626,43 +626,98 @@ def min_heater_range(house_lst, heater_lst):
 
     return max(min_lst)
 
-from collections import deque
 
-class MyQueue2:
+def max_in_window(num_lst, width):
+    """
+    print(max_in_window([2, 3, 4, 2, 6, 2, 5, 1], 3))   
+    """
+    if width > 0 and len(num_lst) < width:
+        raise RuntimeError
+    res_lst = []
+    for i in range(len(num_lst) - width + 1):
+        print(num_lst[i: i + width])
+        res_lst.append(max(num_lst[i: i + width]))
+    return res_lst
+
+
+def print_property(n):
+    if n < 1:
+        raise RuntimeError
+    tmp1 = [0] * (6 * n + 1)
+    tmp2 = [0] * (6 * n + 1)
+    tmp = [tmp1, tmp2]
+    
+    flag = 0
+    for i in range(1, 6 + 1):
+        tmp[flag][i] = 1
+    
+    for i in range(2, n + 1):  # 某个点数和n出现的次数等于上一次n-1, n-2, n-3, n-4, n-5, n-6的总和。两个数组来回错位取值。
+        for j in range(i, 6 * i + 1):
+            tmp[1 - flag][j] = 0
+            if j >= i:
+                for k in range(j - 6, j):
+                    if k > 0:
+                        tmp[1 - flag][j] += tmp[flag][k]
+        flag = 1 - flag
+        
+    if n & 1:
+        return(tmp[0])
+    else:
+        return(tmp[1])
+    
+from random import sample
+    
+class Deck:
+
     def __init__(self):
-        self.queue = deque()
-        self.max_queue = deque()
+        _ranks = [i for _ in range(4) for i in range(1, 13)]
+        _ranks.extend([0, 0])
+        self._deck = _ranks
 
-    def push(self, ele):
-        self.queue.append(ele)
-        if len(self.max_queue) > 0:
-            self.max_queue.append(max(self.max_queue[-1], ele))
+    @property
+    def five(self):
+        return sample(self._deck, 5)
+
+def is_seq(lst):
+    """
+    dd = Deck()
+    f = dd.five
+    print(f)
+    print(is_seq([1, 0, 2, 0, 5]))
+    """
+    assert len(lst) == 5
+    lst.sort()
+    times = 0
+    for i in range(1, 4):
+        if lst[i] == lst[i - 1] and lst[i] != 0:
+            return False
+        if lst[i] - lst[i - 1] == 1:
+            continue
         else:
-            self.max_queue.append(ele)
-
-    def push_back(self, ele):
-        self.queue.appendleft(ele)
-        if len(self.max_queue) > 0:
-            self.max_queue.appendleft(max(self.max_queue[0], ele))
+            times += lst[i] - lst[i - 1]
+            
+    return True if lst.count(0) >= times else False
+    
+def max_diff(num_lst):
+    """
+    print(max_diff([9, 11, 8, 5, 7, 12, 16, 14]))
+    """
+    assert len(num_lst) > 1
+    _max = float('-inf')
+    for i in range(len(num_lst)):
+        if i == 0:
+            _min_price = num_lst[i]
         else:
-            self.max_queue.appendleft(ele)
+            _min_price = min(_min_price, num_lst[i - 1])
+            _max = max(num_lst[i] - _min_price, _max)
+    return _max   
 
-    def pop(self, ele):
-        if len(self.queue) > 0 and len(self.max_queue) > 0:
-            self.max_queue.pop()
-            return self.queue.pop()
-        else:
-            raise RuntimeError
-
-    def pop_front(self, ele):
-        if len(self.queue) > 0 and len(self.max_queue) > 0:
-            self.max_queue.popleft()
-            return self.queue.popleft()
-        else:
-            raise RuntimeError
-
-    def max(self):
-
-
+def add_two_num_without_opt(a, b):
+    sum, carry = 0, 1
+    while carry:
+        sum = a ^ b 
+        carry = (a & b) << 1
+        a, b = sum, carry
+    return sum
 if __name__ == '__main__':
-    print(min_heater_range([1, 2, 3], [2]))
+    print(add_two_num_without_opt(7 ,11))
