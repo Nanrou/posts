@@ -44,11 +44,6 @@ def find_path_in_matrix(matrix, strings):
 
 
 def robot_move_range(rows, cols, k):
-    """
-    mm = [['a', 'b', 't', 'g'], ['c', 'f', 'c', 's'], ['j', 'd', 'e', 'h']]
-    ss = 'bfce'
-    print(find_path_in_matrix(mm, ss))
-    """
     if rows <= 0 or cols <= 0 or k < 0:
         raise RuntimeError
 
@@ -269,3 +264,4 @@ def find_seq_with_sum(num_lst, k):
 
 
 if __name__ == '__main__':
+    pass

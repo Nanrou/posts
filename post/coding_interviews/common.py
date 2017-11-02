@@ -1,11 +1,11 @@
 from copy import deepcopy
+from queue import LifoQueue, Queue
+from itertools import product
 
 """
 一般问题，包括但不限于栈、队列、循环递归、动态规划等。
 """
 
-from queue import LifoQueue, Queue
-from itertools import product
 
 """
 用两个栈实现队列
@@ -27,6 +27,7 @@ class MyQueue:
         ...
     RuntimeError: queue is empty
     """
+
     def __init__(self):
         self.stack1 = LifoQueue()
         self.stack2 = LifoQueue()
@@ -42,6 +43,7 @@ class MyQueue:
                 while not self.stack1.empty():
                     self.stack2.put(self.stack1.get())
         return self.stack2.get()
+
 
 """
 用两个队列实现一个栈。
@@ -63,6 +65,7 @@ class MyStack:
         ...
     RuntimeError: stack is empty
     """
+
     def __init__(self):
         self.queue1 = Queue()
         self.queue2 = Queue()
@@ -85,6 +88,7 @@ class MyStack:
             while self.queue2.qsize() != 1:
                 self.queue1.put(self.queue2.get())
             return self.queue2.get()
+
 
 """
 斐波那契数列
@@ -117,6 +121,7 @@ def fibonacci(n):
         fone, ftwo = ftwo, fi
     return fi
 
+
 """
 爬楼梯
     青蛙上楼梯，一次可以跳1级或者2级，求n级楼梯有多少中跳法。
@@ -148,6 +153,7 @@ def climb_stairs(n):
         fone, ftwo = ftwo, fi
     return fi
 
+
 """
 矩阵中的路径
     设计一函数，判断矩阵中是否存在一条包含指定字符串所有字符的路径。路径可以从任意一格开始，
@@ -158,9 +164,15 @@ def climb_stairs(n):
 def find_path_in_matrix(matrix, strings):
     """
     经典的回溯法题。
+    就是用栈来辅助存储路径，需要注意的是，要一直保存好现在的位置。
     :param matrix: 目标矩阵
     :param strings: 路径
     :return: bool值
+
+    >>> mm = [['a', 'b', 't', 'g'], ['c', 'f', 'c', 's'], ['j', 'd', 'e', 'h']]
+    >>> ss = 'bfce'
+    >>> find_path_in_matrix(mm, ss)
+    True
     """
     dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
@@ -179,7 +191,7 @@ def find_path_in_matrix(matrix, strings):
             origins.append((row, col))
 
     if len(origins) == 0:
-            return False
+        return False
 
     for origin in origins:
         stack = LifoQueue()
@@ -197,59 +209,110 @@ def find_path_in_matrix(matrix, strings):
                         # return stack.queue  # 栈中保存着路径
                         return True
                     if passbile(_matrix, nextp, strings[_index + 1]):
-                        stack.put((_pos, i + 1, _index))
+                        stack.put((_pos, i + 1, _index))  # 要把现在的位置也要塞回栈中
                         mark(_matrix, nextp)
                         stack.put((nextp, 0, _index + 1))
                         break
     return False
 
 
-def cut_the_rope(lenght):
-    if lenght < 2:
+"""
+剪绳子
+    给定一段长度为n的绳子，要求将绳子剪成m段，要求这m段绳子的长度乘积最大。
+"""
+
+
+def cut_the_rope(length):
+    """
+    动态规划。当前最优解依靠前一个最优解。状态转移方程为f(n) = max(f(i) * f(n-i)) 0 < i < n，i指剪的长度
+    :param length: 绳子长度
+    :return: 所剪绳子能得到的最大乘积
+
+    >>> cut_the_rope(1)
+    0
+    >>> cut_the_rope(16)
+    324
+    """
+    if length < 2:
         return 0
-    if lenght == 2:
+    if length == 2:
         return 1
-    if lenght == 3:
+    if length == 3:
         return 2
 
     factor_list = [0, 1, 2, 3]
-    for i in range(4, lenght + 1):
+    for i in range(4, length + 1):  # 获得每个长度的最优解
         factor_list.append(0)
-        for j in range(1, i // 2 + 1):
+        for j in range(1, i // 2 + 1):  # 遍历所有的剪法，来更新得到最大的值。等于是一直填表，供后面使用。
             factor_list[i] = max(factor_list[i], factor_list[j] * factor_list[i - j])
     return factor_list[-1]
 
 
-def count_how_many_one1(num):
-    count = 0
-    while num > 0:
-        num &= (num - 1)
-        count += 1
-    return count
+"""
+二进制中1的个数
+    输入一个整数，输出这个整数二进制中1出现的次数。
+"""
 
 
-def count_how_many_one2(num):
+def count_how_many_one(num):
+    """
+    不直接对输入做处理，而是改变比较值，逐步增大比较值，和输入的每一位做与操作。
+    :param num: 输入number
+    :return: 1出现的次数
+    >>> count_how_many_one(0)
+    0
+    >>> count_how_many_one(3)
+    2
+    >>> count_how_many_one(16)
+    1
+    >>> count_how_many_one(0x7fffffff)
+    31
+    """
     count, flag = 0, 1
-    while flag < num:
+    while flag <= num:
         if num & flag:
             count += 1
         flag <<= 1  # 增大比较位而不是右移输入
     return count
 
 
-def my_pow(base, exponent):  # 只支持整数
-    if base == 0 and exponent < 0:
-        raise RuntimeError
+"""
+数值的整数次方
+    输入一个数n，和整数e，求n的e次方
+"""
 
-    def pow_core(base, unsign_exponent):
-        if unsign_exponent == 0:
+
+def my_pow(base, exponent):
+    """
+    要考虑数的范围，如正负会有不同的处理方式。其次要有优化的意识，分而治之。如16次方，
+可以是0->2->4->8->16，只用4次，如果只是循环乘，则需要16次
+    :param base: 底数
+    :param exponent: 次方数
+    :return: 底数的次方
+
+    >>> my_pow(2, 0)
+    1
+    >>> my_pow(2, 4)
+    16
+    >>> my_pow(0, 3)
+    0
+    >>> my_pow(0, -1)
+    Traceback (most recent call last):
+        ...
+    RuntimeError
+    """
+    if base == 0 and exponent < 0:
+        raise RuntimeError()
+
+    def pow_core(base_, unsigned_exponent):  # 分而治之，递归处理相同的次方数。
+        if unsigned_exponent == 0:
             return 1
-        if unsign_exponent == 1:
-            return base
-        res = pow_core(base, unsign_exponent >> 1)  # 划分成两部分
+        if unsigned_exponent == 1:
+            return base_
+        res = pow_core(base_, unsigned_exponent >> 1)  # 划分成两部分去处理
         res *= res  # 这两部分乘回来
-        if unsign_exponent & 0b1:  # 若指数为奇数，这里补上那一次
-            res *= base
+        if unsigned_exponent & 0b1:  # 若指数为奇数，这里补上那一次
+            res *= base_
         return res
 
     if exponent < 0:
@@ -258,13 +321,31 @@ def my_pow(base, exponent):  # 只支持整数
         return pow_core(base, exponent)
 
 
+"""
+打印从1到最大的n位数
+    输入数字n，按顺序打印出从1到n最大的n位十进制数。
+"""
+
+
 def print_range_number(n):  # 就是输出全排列
+    """
+    其实就是输出这n位数的全排列，n为多少，就嵌套n层0~9的循环
+    :param n: number
+    :return: 输出1~n位数的所有
+    >>> print_range_number(0)
+    >>> print_range_number(2)  # doctest: +ELLIPSIS
+    [0, 1, ..., 98, 99]
+    """
+    if n == 0:
+        return None
     base_list = [i for i in range(10)]
     ll = []
+    res = []
     for _ in range(n):
         ll.append(base_list)
     for ele in product(*ll):
-        print(int(''.join([str(e) for e in ele])))
+        res.append(int(''.join([str(e) for e in ele])))
+    return res
 
 
 def is_match(s, p):  # p是带有正则表达式的字符串。中心思想在于*单独出现是没有意义的，它前面必定跟着一个字符。
