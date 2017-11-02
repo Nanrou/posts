@@ -1,4 +1,10 @@
+from queue import LifoQueue
+
+
 class ListNode:
+    """
+    普通链表的定义
+    """
     def __init__(self, val, next=None):
         self.val = val
         self.next = next
@@ -6,11 +12,19 @@ class ListNode:
     def __str__(self):
         return str(self.val)
 
+
+class ComplexListNode(ListNode):
+    """ 每个结点均多了一个指向其他结点的指针 """
+    complex = None
+
 """
 5 -> 2 -> 4 -> 0 -> 8 -> None
 """
 
-def product_linked_list(val_list=[5, 2, 4, 0, 8]):
+
+def product_linked_list(val_list=None):  # 生成普通链表
+    if val_list is None:
+        val_list = [5, 2, 4, 0, 8]
     dummy = ListNode(None)
     p = dummy
     for i in val_list:
@@ -18,22 +32,28 @@ def product_linked_list(val_list=[5, 2, 4, 0, 8]):
         p.next = n
         p = n
     return dummy.next
-    
-def product_loop_linked_list(val_list=[5, 2, 4, 0, 8], entry_node = 4):
+
+
+def product_loop_linked_list(val_list=None, entry_node=4):  # 生成有环的链表
+    if val_list is None:
+        val_list = [5, 2, 4, 0, 8]
     dummy = ListNode(None)
     p = dummy
+    loop_entry = None
     for index, i in enumerate(val_list):
         n = ListNode(i)
         if index == entry_node:
             loop_entry = n
         p.next = n
         p = n
-    p.next = loop_entry
+    if loop_entry:
+        p.next = loop_entry
     return dummy.next
-    
-def product_common_node_linked_list():
-    commen_node = ListNode(None)
-    curr = commen_node
+
+
+def product_common_node_linked_list():  # 生成Y型链表，就是两个头部指针，指向同一个尾部
+    common_node = ListNode(None)
+    curr = common_node
     for i in range(5):
         n = ListNode(i)
         curr.next = n
@@ -46,7 +66,7 @@ def product_common_node_linked_list():
         curr.next = n
         curr = n
         
-    curr.next = commen_node.next
+    curr.next = common_node.next
     
     dummy2 = ListNode(None)
     curr = dummy2
@@ -54,12 +74,18 @@ def product_common_node_linked_list():
         n = ListNode(i)
         curr.next = n
         curr = n
-    curr.next = commen_node.next
+    curr.next = common_node.next
     return dummy1.next, dummy2.next
-    
-    
-    
-def print_linked_list(head, t=0, proc=lambda x: print(x, end=" ")):
+
+
+def print_linked_list(head, t=None, proc=lambda x: print(x, end=" ")):
+    """
+    遍历链表并对其中元素进行操作，默认操作是打印
+    :param head: 链表的头部
+    :param t: 对前t个元素进行操作，默认None是对全部都进行操作
+    :param proc: 对每个元素的操作，默认是打印
+    :return:
+    """
     p = head
     i = 0
     while p is not None:
@@ -72,13 +98,45 @@ def print_linked_list(head, t=0, proc=lambda x: print(x, end=" ")):
                 i += 1
     print()
     
+"""
+从尾到头打印链表
+    输入链表的头部结点，从尾到头打印出各结点。
+"""
     
-def delete_node_in_O1(node):  # 将下一个结点复制到当前结点，然后当前结点指向下下个结点，那么也等于删掉当前结点
+    
+def print_linked_list_reversed(node):
+    """
+    不改变原链表的前提下，需要用栈来辅助实现。
+    :param node: 链表的头部结点
+    :return: 从尾到头的结点列表
+    >>> head = product_linked_list()
+    >>> print_linked_list_reversed(head)
+    [8, 0, 4, 2, 5]
+    >>> print_linked_list_reversed(ListNode(1))
+    [1]
+    >>> print_linked_list_reversed(None)
+
+    """
+    if node is None:
+        return None
+    stack = LifoQueue()
+    curr = node
+    while curr is not None:
+        stack.put(curr.val)
+        curr = curr.next
+    res = []
+    while not stack.empty():
+        res.append(stack.get())
+    return res
+
+
+def delete_node_in_one_pass(node):  # 将下一个结点复制到当前结点，然后当前结点指向下下个结点，那么也等于删掉当前结点
     if node.next:
         node.val, node.next = node.next.val, node.next.next
     else:
         node.val = node.next = None
-        
+
+
 def delete_duplicate_node(head):
     """
     ll = [[1, 2, 3, 3, 4, 4, 5], [1, 2, 3, 3, 4, 4,], [2, 2, 3, 3, 4, 4, 5], [1, 2, 3, 4, 5]]
@@ -231,10 +289,7 @@ def merge_two_sorted_linked_list(a, b):
     else:
         curr.next = b
     return dummy.next
-    
-class ComplexListNode(ListNode):
-    complex = None
-        
+
 # 注意分析复杂度
 def clone_complex_linked_list(head):  # 分三步走: 1在每个结点后面复制出副本，2根据原来的指向，复制原来指向的next就等于复制了原来的关系，3将链表拆分
     def clone(_head):
@@ -397,4 +452,6 @@ def last_remaining(node, k):
         print(curr)
 
 if __name__ == '__main__':
-    
+    import doctest
+
+    doctest.testmod()

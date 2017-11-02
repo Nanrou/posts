@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 """
 一般问题，包括但不限于栈、队列、循环递归、动态规划等。
 """
@@ -5,8 +7,26 @@
 from queue import LifoQueue, Queue
 from itertools import product
 
+"""
+用两个栈实现队列
+"""
+
 
 class MyQueue:
+    """
+    画图去模拟一下实际操作就知道了。简单点说就是一个栈负责进，另外一个栈负责出，出的时候去需要与前一个栈配合。
+    >>> my_queue = MyQueue()
+    >>> my_queue.put(1)
+    >>> my_queue.put(2)
+    >>> my_queue.get()
+    1
+    >>> my_queue.get()
+    2
+    >>> my_queue.get()
+    Traceback (most recent call last):
+        ...
+    RuntimeError: queue is empty
+    """
     def __init__(self):
         self.stack1 = LifoQueue()
         self.stack2 = LifoQueue()
@@ -23,8 +43,26 @@ class MyQueue:
                     self.stack2.put(self.stack1.get())
         return self.stack2.get()
 
+"""
+用两个队列实现一个栈。
+"""
+
 
 class MyStack:
+    """
+    这个情况麻烦一点，因为不断地把最后一项摆到前面来，所以每次取的时候都要移动一整个队列。
+    >>> my_stack = MyStack()
+    >>> my_stack.put(1)
+    >>> my_stack.put(2)
+    >>> my_stack.get()
+    2
+    >>> my_stack.get()
+    1
+    >>> my_stack.get()
+    Traceback (most recent call last):
+        ...
+    RuntimeError: stack is empty
+    """
     def __init__(self):
         self.queue1 = Queue()
         self.queue2 = Queue()
@@ -48,68 +86,122 @@ class MyStack:
                 self.queue1.put(self.queue2.get())
             return self.queue2.get()
 
+"""
+斐波那契数列
+    输入n，返回斐波那契数列的第n项。
+"""
+
 
 def fibonacci(n):
-    fone, ftwo = 0, 1
+    """
+    可以用递归，也可以用循环。因为涉及到很多重复的子问题，所以用循环会好很多。
+    :param n: 整数n
+    :return: 斐波那契数列的第n项
+
+    >>> fibonacci(0)
+    0
+    >>> fibonacci(3)
+    2
+    >>> fibonacci(13)
+    233
+    """
+    if n < 0:
+        raise RuntimeError
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    fone, ftwo, fi = 0, 1, None
     for _ in range(2, n + 1):
         fi = fone + ftwo
         fone, ftwo = ftwo, fi
     return fi
 
+"""
+爬楼梯
+    青蛙上楼梯，一次可以跳1级或者2级，求n级楼梯有多少中跳法。
+"""
+
 
 def climb_stairs(n):
-    fone, ftwo = 1, 2
+    """
+    由于跳法是固定的，设f(n)为n级的跳法，则有f(n) = f(n-1) + f(n-2)。
+这是很符合直觉的，因为要跳到第n级，要么是我在n-1级的时候，跳一级来达到n；要
+么是我在n-2级的时候，通过跳两级来达到n。所以这里跟斐波那契是一样的解决方法了。
+    :param n: n级楼梯
+    :return: 跳法总数
+
+    >>> climb_stairs(2)
+    2
+    >>> climb_stairs(13)
+    377
+    """
+    if n < 1:
+        raise RuntimeError
+    if n == 1:
+        return 1
+    if n == 2:
+        return 2
+    fone, ftwo, fi = 1, 2, None
     for _ in range(3, n + 1):
         fi = fone + ftwo
         fone, ftwo = ftwo, fi
     return fi
 
+"""
+矩阵中的路径
+    设计一函数，判断矩阵中是否存在一条包含指定字符串所有字符的路径。路径可以从任意一格开始，
+每一步都可以往上下左右走，每个方格只允许进入一次。
+"""
 
-def sort_age1(lst):
-    """    
-    from random import randint
 
-    bb = []
-    for _ in range(12):
-        bb.append(randint(18, 70))
-    print(bb)
-    print(sort_age1(bb))
-    print(sort_age2(bb))
+def find_path_in_matrix(matrix, strings):
     """
-    if len(lst) > 1:
-        times_of_age = []
-        for _ in range(18, 71):
-            times_of_age.append(0)
-        for i in lst:
-            assert 17 < i < 70
-            times_of_age[i - 18] += 1
+    经典的回溯法题。
+    :param matrix: 目标矩阵
+    :param strings: 路径
+    :return: bool值
+    """
+    dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
-        sorted_ages = []
-        for index, times in enumerate(times_of_age):
-            for _ in range(times):
-                sorted_ages.append(index + 18)
+    def mark(m, pos):
+        m[pos[0]][pos[1]] = None
 
-        return sorted_ages
-    else:
-        return lst
+    def passbile(m, pos, char):
+        return m[pos[0]][pos[1]] is char
 
+    if len(strings) <= 0:
+        raise RuntimeError('invalid input')
 
-def sort_age2(lst):  # 基数排序，时间复杂度为O(d*(n+k))，d是关键码长度，k是桶的数量，空间复杂度为O(kn)
-    if len(lst) > 1:
-        bucket_list = [[] for _ in range(10)]
-        res = list(lst)
-        for i in range(2):
-            for ele in res:
-                index = ele // (10 ** i) % 10
-                bucket_list[index].append(ele)
-            res.clear()
-            for bucket in bucket_list:
-                for j in bucket:
-                    res.append(j)
-                bucket.clear()
-        return res
-    else:
-        return lst
+    origins = []
+    for row, col in product(range(len(matrix)), range(len(matrix[0]))):
+        if matrix[row][col] == strings[0]:
+            origins.append((row, col))
+
+    if len(origins) == 0:
+            return False
+
+    for origin in origins:
+        stack = LifoQueue()
+        stack.put((origin, 0, 0))
+        _matrix = deepcopy(matrix)
+
+        while not stack.empty():
+            _pos, _nxt, _index = stack.get()
+            for i in range(_nxt, len(dirs)):
+                nextp = (_pos[0] + dirs[i][0], _pos[1] + dirs[i][1])
+                if -1 < nextp[0] < len(_matrix) and -1 < nextp[1] < len(_matrix[0]):
+                    if _index == len(strings) - 2 and _matrix[nextp[0]][nextp[1]] == strings[_index + 1]:
+                        # stack.put((_pos, 0, _index))  # 当前位置已经不在栈中了
+                        # stack.put((nextp, 0, _index + 1))
+                        # return stack.queue  # 栈中保存着路径
+                        return True
+                    if passbile(_matrix, nextp, strings[_index + 1]):
+                        stack.put((_pos, i + 1, _index))
+                        mark(_matrix, nextp)
+                        stack.put((nextp, 0, _index + 1))
+                        break
+    return False
 
 
 def cut_the_rope(lenght):
@@ -131,7 +223,7 @@ def cut_the_rope(lenght):
 def count_how_many_one1(num):
     count = 0
     while num > 0:
-        num = (num - 1) & num
+        num &= (num - 1)
         count += 1
     return count
 
@@ -141,7 +233,7 @@ def count_how_many_one2(num):
     while flag < num:
         if num & flag:
             count += 1
-        flag = flag << 1  # 增大比较位而不是右移输入
+        flag <<= 1  # 增大比较位而不是右移输入
     return count
 
 
@@ -646,11 +738,11 @@ def print_property(n):
     tmp1 = [0] * (6 * n + 1)
     tmp2 = [0] * (6 * n + 1)
     tmp = [tmp1, tmp2]
-    
+
     flag = 0
     for i in range(1, 6 + 1):
         tmp[flag][i] = 1
-    
+
     for i in range(2, n + 1):  # 某个点数和n出现的次数等于上一次n-1, n-2, n-3, n-4, n-5, n-6的总和。两个数组来回错位取值。
         for j in range(i, 6 * i + 1):
             tmp[1 - flag][j] = 0
@@ -659,16 +751,17 @@ def print_property(n):
                     if k > 0:
                         tmp[1 - flag][j] += tmp[flag][k]
         flag = 1 - flag
-        
-    if n & 1:
-        return(tmp[0])
-    else:
-        return(tmp[1])
-    
-from random import sample
-    
-class Deck:
 
+    if n & 1:
+        return (tmp[0])
+    else:
+        return (tmp[1])
+
+
+from random import sample
+
+
+class Deck:
     def __init__(self):
         _ranks = [i for _ in range(4) for i in range(1, 13)]
         _ranks.extend([0, 0])
@@ -677,6 +770,7 @@ class Deck:
     @property
     def five(self):
         return sample(self._deck, 5)
+
 
 def is_seq(lst):
     """
@@ -695,9 +789,10 @@ def is_seq(lst):
             continue
         else:
             times += lst[i] - lst[i - 1]
-            
+
     return True if lst.count(0) >= times else False
-    
+
+
 def max_diff(num_lst):
     """
     print(max_diff([9, 11, 8, 5, 7, 12, 16, 14]))
@@ -710,14 +805,17 @@ def max_diff(num_lst):
         else:
             _min_price = min(_min_price, num_lst[i - 1])
             _max = max(num_lst[i] - _min_price, _max)
-    return _max   
+    return _max
+
 
 def add_two_num_without_opt(a, b):
     sum, carry = 0, 1
     while carry:
-        sum = a ^ b 
+        sum = a ^ b
         carry = (a & b) << 1
         a, b = sum, carry
     return sum
+
+
 if __name__ == '__main__':
-    print(add_two_num_without_opt(7 ,11))
+    print(add_two_num_without_opt(7, 11))

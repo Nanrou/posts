@@ -3,7 +3,7 @@ from binarytree import show
 
 
 class BinTreeNode:
-    """ 普通二叉数结点的定义 """
+    """ 普通二叉树的结点定义 """
 
     def __init__(self, data, left=None, right=None):
         self.data = data
@@ -16,18 +16,37 @@ class BinTreeNode:
     def __repr__(self):
         return self.__str__()
         
+"""
+重建二叉树
+    输入前序遍历和中序遍历，以此来生成对应的二叉树。
+"""
 
 
 def build_bin_tree(preorder, inorder):
     """
-    from basic_operation import preorder
+    由前序遍历可以知道根结点的位置，根据这个结点在中序遍历的位置，划分出左右子树。
+    后面都是可以用递归去做了，递归结束的条件为到叶结点，也就是划分出来的数组长度为1的时候。
 
-    root = build_bin_tree([1, 2, 4, 7, 3, 5, 6, 8], [4, 7, 2, 1, 5, 3, 8, 6])
-    preorder(root, lambda x: print(x, end=" "))
+    :param preorder: 前序遍历
+    :param inorder: 中序遍历
+    :return: 二叉树的根结点
+
+    >>> from basic_operation import preorder  # 这个是输出前序遍历的func
+
+    >>> root = build_bin_tree([1, 2, 4, 7, 3, 5, 6, 8], [4, 7, 2, 1, 5, 3, 8, 6])
+    >>> preorder(root, lambda x: print(x, end=","))
+    1,2,4,7,3,5,6,8,
+    >>> root = build_bin_tree([1], [1])
+    >>> preorder(root, lambda x: print(x, end=""))
+    1
+    >>> root = build_bin_tree([1], [1, 2])
+    Traceback (most recent call last):
+        ...
+    AssertionError: invalid input
     """
-    assert len(preorder) > 0 and len(preorder) == len(inorder)
+    assert len(preorder) > 0 and len(preorder) == len(inorder), 'invalid input'
 
-    def build_bin_tree_core(_preorder, _inorder):
+    def build_bin_tree_core(_preorder, _inorder):  # 递归主逻辑
         root = BinTreeNode(_preorder[0])
         if len(_preorder) == 1:  # 递归结束的判断是到达叶结点
             if _preorder == _inorder:
@@ -48,8 +67,8 @@ def build_bin_tree(preorder, inorder):
         return root
 
     return build_bin_tree_core(preorder, inorder)
-    
-    
+
+
 def is_subtree(root1, root2):
     """
     from basic_operation import sorted_bin_tree_root as a_root
@@ -57,6 +76,15 @@ def is_subtree(root1, root2):
     b_root = BinTreeNode(6, *leafs)
     print(is_subtree(a_root, b_root))
     """
+    def is_subtree_core(r1, r2):
+        if r2 is None:
+            return True
+        if r1 is None:
+            return False
+        if r1.data != r2.data:
+            return False
+        return is_subtree_core(r1.left, r2.left) and is_subtree_core(r1.right, r2.right)
+
     res = False
     
     if root1 is not None and root2 is not None:
@@ -68,16 +96,7 @@ def is_subtree(root1, root2):
             res = is_subtree(root1.right, root2)        
     return res
     
-def is_subtree_core(r1, r2):
-    if r2 is None:
-        return True
-    if r1 is None:
-        return False
-    if r1.data != r2.data:
-        return False
-    return is_subtree_core(r1.left, r2.left) and is_subtree_core(r1.right, r2.right)
 
-    
 def mirror_tree(node):
     """
     from basic_operation import sorted_bin_tree_root as eg_root
@@ -95,7 +114,8 @@ def mirror_tree(node):
         node.left, node.right = node.right, node.left
         mirror_tree(node.left)
         mirror_tree(node.right)
-        
+
+
 def is_symmetrical_tree(node):  # 用中序遍历去判断，一般中序从左到中到右，定义一个新的从右到中到左，比较这两个排序就可以了，注意要处理空的字节
     """
     from basic_operation import sorted_bin_tree_root as eg_root
@@ -155,7 +175,8 @@ def print_tree_row_by_row(node):  # 用两个变量维持当行与下行的结�
         if to_be_printed == 0:
             print()
             to_be_printed, next_level = next_level, 0
-            
+
+
 def print_tree_by_z(node):  # 用两个栈来分别存放奇数行和偶数行的结点，用两个变量来判断奇偶
     if node is None:
         raise RuntimeError
@@ -182,7 +203,8 @@ def print_tree_by_z(node):  # 用两个栈来分别存放奇数行和偶数行�
             print()
             current = 1 - current
             next = 1 - next
-            
+
+
 def conclude_postorder_seq(postorder_seq):  # 就是利用二叉数的特征，结点的左边都比右边小
     """
     print(conclude_postorder_seq([5, 7, 6, 9, 11, 10, 8]))
@@ -209,7 +231,8 @@ def conclude_postorder_seq(postorder_seq):  # 就是利用二叉数的特征，�
         return left & right
 
     return conclude_core(postorder_seq)
-    
+
+
 def find_path_in_tree(node, num):
     """
     r = BinTreeNode(10, BinTreeNode(5, BinTreeNode(4), BinTreeNode(7)), BinTreeNode(12))
@@ -237,7 +260,8 @@ def find_path_in_tree(node, num):
             stack.put((_node.right, _sum + _node.right.data, _new_path))
     if not flag:
         print('not found')
-        
+
+
 def serialize_tree(node):  # 要模拟流输入
     if node is None:
         print('$', end=" ")  # 要用流输出
@@ -245,7 +269,8 @@ def serialize_tree(node):  # 要模拟流输入
     print(node.data, end=" ")
     serialize_tree(node.left)
     serialize_tree(node.right)
-    
+
+
 def find_kth_in_tree(node, k):
     """
     from basic_operation import sorted_bin_tree_root as a_root
@@ -264,12 +289,14 @@ def find_kth_in_tree(node, k):
     else:
         return None
 
+
 def depth_of_tree(node):  # 第一反应想到的是通过遍历去找到最深的值，但是实现起来有点复杂，用递归会简洁很多。
     if node is None:  # 空的时候深度为0
         return 0
     left = depth_of_tree(node.left)
     right = depth_of_tree(node.right)
     return max(left, right) + 1  # 每一层都会使深度加一,然后最大值就是取在这层之前的最大值
+
 
 def is_balanced_tree(node):  # 也是后序遍历，在递归的时候传递flag和深度  
     """
@@ -287,7 +314,8 @@ def is_balanced_tree(node):  # 也是后序遍历，在递归的时候传递flag
     
     return is_balanced_tree_core(node)[0]
     
- 
- 
+
 if __name__ == '__main__':
-    
+    import doctest
+
+    doctest.testmod()

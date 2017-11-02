@@ -1,18 +1,3 @@
-def find_min_in_rotate(lst):
-    if len(lst) > 1:
-        start, end = 0, len(lst) - 1
-        while lst[start] >= lst[end]:
-            if end - start == 1:
-                return lst[end]
-            mid = (start + end) // 2
-            if lst[mid] > lst[start]:
-                start = mid
-            else:
-                end = mid
-        return lst[start]
-    else:
-        return lst
-
 
 from queue import LifoQueue
 from itertools import product

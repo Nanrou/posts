@@ -57,7 +57,7 @@ def inorder(node, proc):  # 中根序
             node = node.right
 
 
-def postorder(node, proc):  # 后根序	
+def postorder(node, proc):  # 后根序
     s = LifoQueue()
     while node is not None or not s.empty():
         while node is not None:
@@ -177,16 +177,23 @@ def quick_sort(num_list):  # 主函数
         def _quick_sort_core(nums, start, end):  # 递归函数
             if start >= end:
                 return
-            i = partition(num_list, start, end)
-            _quick_sort_core(num_list, start, i - 1)
-            _quick_sort_core(num_list, i + 1, end)
+            i = partition(nums, start, end)
+            _quick_sort_core(nums, start, i - 1)
+            _quick_sort_core(nums, i + 1, end)
 
         _quick_sort_core(num_list, 0, len(num_list) - 1)
     else:
         return num_list
 
 
-def quick_sort1(num_list):  # 同样也是用基准值去比较，但不是向上面那样，左右两边向中间逼近，而是大小区间都在左边，逐渐覆盖到右边。因为右边本来就是比较大的，所以只用处理较小的元素：每当找到小的元素（它现在在较大的最右），将这个元素与下标为i的对调，因为下标i就是最小的最右
+"""
+ 同样也是用基准值去比较，但不是向上面那样，左右两边向中间逼近，而是大小区间都在左边，
+ 逐渐覆盖到右边。因为右边本来就是比较大的，所以只用处理较小的元素：每当找到小的元素
+ （它现在在较大的最右），将这个元素与下标为i的对调，因为下标i就是最小的最右
+"""
+
+
+def quick_sort1(num_list):
     def qsort(lst, start, end):
         if start >= end:
             return
@@ -197,7 +204,7 @@ def quick_sort1(num_list):  # 同样也是用基准值去比较，但不是向�
                 i += 1
                 lst[i], lst[j] = lst[j], lst[i]
         lst[start], lst[i] = lst[i], lst[start]
-        
+
         qsort(lst, start, i - 1)
         qsort(lst, i + 1, end)
 
