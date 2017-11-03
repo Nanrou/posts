@@ -80,15 +80,6 @@ def robot_move_range(rows, cols, k):
     return count
 
 
-def sort_odd_and_even(lst):
-    i, j = 0, len(lst) - 1
-    while i < j:
-        while i < j and lst[j] & 0b1 == 0:
-            j -= 1
-        while i < j and lst[i] & 0b1 != 0:
-            i += 1
-        if i < j:
-            lst[i], lst[j] = lst[j], lst[i]
 
 
 def conclude_even(ele):

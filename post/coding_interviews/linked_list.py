@@ -12,6 +12,9 @@ class ListNode:
     def __str__(self):
         return str(self.val)
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class ComplexListNode(ListNode):
     """ 每个结点均多了一个指向其他结点的指针 """
@@ -96,7 +99,7 @@ def print_linked_list(head, t=None, proc=lambda x: print(x, end=" ")):
                 break
             else:
                 i += 1
-    print()
+    # print()
     
 """
 从尾到头打印链表
@@ -130,23 +133,55 @@ def print_linked_list_reversed(node):
     return res
 
 
-def delete_node_in_one_pass(node):  # 将下一个结点复制到当前结点，然后当前结点指向下下个结点，那么也等于删掉当前结点
+"""
+删除链表中的结点
+    给定单向链表的头指针和一个结点指针，定义一个函数在O(1)时间内删除该结点。
+"""
+
+
+def delete_node_in_one_pass(node):
+    """
+    普通的想法是，从头开始遍历，然后在发现下个结点是目标结点的时候，将指针指向再下
+一个结点，这就等于删除了目标结点。问题是这个的复杂度是O(n)。
+    换个角度，将下一个结点复制到当前结点，然后当前结点指向下下个结点，那么也等于删
+掉当前结点。这样做复杂度就仅为O(1)。
+    :param node: 链表的头部指针
+    :return: None
+    """
     if node.next:
         node.val, node.next = node.next.val, node.next.next
     else:
         node.val = node.next = None
 
 
+"""
+删除链表中重复的结点
+    在一个排序的链表中，删除掉重复的结点。
+"""
+
+
 def delete_duplicate_node(head):
     """
-    ll = [[1, 2, 3, 3, 4, 4, 5], [1, 2, 3, 3, 4, 4,], [2, 2, 3, 3, 4, 4, 5], [1, 2, 3, 4, 5]]
-    for l in ll:
-        print('----------')
-        head = product_linked_list(l)
-        print_linked_list(head)
-        print() 
-        print_linked_list(delete_duplicate_node(head))
-        print() 
+    先要注意的地方有，用dummy头部，因为输入的头部有可能会被删除掉。
+    因为删除重复结点的时候，连当前结点也要删掉的，所以要用双指针来解决问题。
+    :param head: 待操作的链表头部结点
+    :return: 操完完成后的链表头部结点
+
+    >>> head = product_linked_list([1, 2, 3, 3, 4, 4, 5])
+    >>> print_linked_list(delete_duplicate_node(head), proc=lambda x: print(x, end=','))
+    1,2,5,
+    >>> head = product_linked_list([1, 2, 2, 3, 3, 4, 4])
+    >>> print_linked_list(delete_duplicate_node(head), proc=lambda x: print(x, end=','))
+    1,
+    >>> head = product_linked_list([2, 2, 3, 3, 4, 4, 5])
+    >>> print_linked_list(delete_duplicate_node(head), proc=lambda x: print(x, end=','))
+    5,
+    >>> head = product_linked_list([1, 2, 3, 4, 5])
+    >>> print_linked_list(delete_duplicate_node(head), proc=lambda x: print(x, end=','))
+    1,2,3,4,5,
+    >>> head = product_linked_list([2, 2, 3, 3, 4, 4])
+    >>> print_linked_list(delete_duplicate_node(head), proc=lambda x: print(x, end=','))
+
     """
 
     if head is None or head.next is None:
@@ -158,30 +193,48 @@ def delete_duplicate_node(head):
     curr = curr.next
     while curr.next is not None: 
         if curr.next and curr.val == curr.next.val:
-            while curr.next and curr.val == curr.next.val:
+            while curr.next and curr.val == curr.next.val:  # 跳过重复节点
                 curr = curr.next
-            if curr is None or curr.next is None:
+            if curr is None or curr.next is None:  # 有重复的时候要小心判断，删除完之后的情况
                 pre.next = None
             else:
                 curr = curr.next
                 pre.next = curr
         else:
-            curr = curr.next
+            curr = curr.next  # 没重复的时候就一起向前
             pre = pre.next
  
     return dummy.next
-        
+
+
+"""
+链表中倒数第k个结点
+    输入一个链表，输出该链表中倒数第k个结点
+"""
+
 
 def find_last_k_node(head, k):  # 链表问题都加一个dummy表头来做就好了
     """
-    h = product_linked_list()
-    print_linked_list(h)
-    k = find_last_k_node(h, 7)
-    print_linked_list(k)
-    
+    第一反应是，可以通过栈来存放所有结点，然后再出栈k个来得到结果。
+    然后就是利用双指针，走在前面的指针先走k步，然后两个指针再一起走，这样的话
+前面指针到尾部时，后面的指针刚好指向倒数第k个。要注意的是k比链表还要长的情况。
+    链表问题尽量用dummy头来辅助求解。
+    :param head: 链表的头部结点
+    :param k: 倒数第几个结点
+    :return: 目标结点
+
+    >>> h = product_linked_list()  # 链表 [5, 2, 4, 0, 8]
+    >>> find_last_k_node(h, 3)
+    4
+    >>> find_last_k_node(h, 5)
+    5
+    >>> find_last_k_node(h, 7)
+    Traceback (most recent call last):
+        ...
+    RuntimeError: k must little than length of linked list
     """
     
-    if head is None or k == 0:
+    if head is None or k < 1:
         return head
     dist = k
     dummy = ListNode(None)    
@@ -192,7 +245,7 @@ def find_last_k_node(head, k):  # 链表问题都加一个dummy表头来做就�
             curr = curr.next
             dist -= 1
         except AttributeError:  # k比链表长
-            return dummy.next
+            raise RuntimeError('k must little than length of linked list')
         
     pre = dummy
     while curr is not None:
@@ -200,8 +253,20 @@ def find_last_k_node(head, k):  # 链表问题都加一个dummy表头来做就�
         curr = curr.next
     return pre
 
+
+"""
+链表中环的入口结点
+    如果一个链表中包含环，请找出环的入口结点。
+"""
+
+
 def find_entry_of_loop(head):
     """
+    先要判断链表是否有环，用双指针去判断，一个指针一次循环前进两次，一个指针一次循环前进一次，
+若能够相遇，则说明有环，且相遇的点必定在环内。
+    然后要求出环的长度，就从刚才相遇的点出发，计数重新回到这个点的循环次数，则为环的长度。
+    最后采用双指针的方法，这个用法很符合直觉的，环内的点完走环的长度会回到这个点，双指针的就是
+前面那个指针先走环的长度，然后后面的再开始走，则两个指针会在环的入口处相遇。
     h = product_loop_linked_list()
     print_linked_list(h, 10)
     print(find_entry_of_loop(h).val)
@@ -212,7 +277,7 @@ def find_entry_of_loop(head):
         p_slow = head.next
         p_fast = p_slow.next
     except AttributeError:
-        raise RuntimeError('linked list hasnt loop')
+        raise RuntimeError('this linked list hasnt loop.')
     
     while p_slow or p_fast:  # 判断是否有环
         if p_fast == p_slow:
@@ -223,7 +288,7 @@ def find_entry_of_loop(head):
         if p_fast.next:
             p_fast = p_fast.next
     else:
-        raise RuntimeError('linked list hasnt loop')
+        raise RuntimeError('this linked list hasnt loop')
     
     count = 1
     p_the_one = p_the_one.next
@@ -240,7 +305,8 @@ def find_entry_of_loop(head):
         p_node1 = p_node1.next
         p_node2 = p_node2.next
     return p_node2
-    
+
+
 def reverse_linked_list(head):
     """
     h = product_linked_list()
