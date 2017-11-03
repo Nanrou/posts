@@ -8,7 +8,6 @@ from re import match
 一般问题，包括但不限于栈、队列、循环递归、动态规划等。
 """
 
-
 """
 用两个栈实现队列
 """
@@ -382,6 +381,7 @@ def is_match(s, p):
                (p[0] is '.' or p[0] is s[0]) and \
                is_match(s[1:], p[1:])
 
+
 """
 表示数值的字符串
     实现一个函数来判断字符串是否能转换成数值。
@@ -401,47 +401,68 @@ def is_numeric(strings):
         return False
 
 
-def print_matrix_clock_wisely(matrix):
+"""
+顺时针打印矩阵
+    输入一矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字。
+"""
+
+
+def matrix_clock_wisely(matrix):
     """
-    n = 1
-    bb = []
-    for i in range(n):
-        bb.append([])
-        for j in range(n):
-            bb[i].append(j + i * n + 1)
-    for b in bb:
-        print(b)
-    print_matrix_clock_wisely(bb)
+    就是要对矩阵进行分析，先要分析出每次循环的前提，然后是每个方向是否可以打印的判断
+    :param matrix: 矩阵
+    :return: 顺时针打印的结果
+
+    >>> matrix_clock_wisely([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
+    [1, 2, 3, 4, 8, 12, 16, 15, 14, 13, 9, 5, 6, 7, 11, 10]
+    >>> matrix_clock_wisely([[1]])
+    [1]
+    >>> matrix_clock_wisely([1])
+    Traceback (most recent call last):
+        ...
+    RuntimeError: invalid matrix
     """
-    if matrix is None or (not len(matrix) and not len(matrix)):
+    if matrix is None or not isinstance(matrix, list) or not isinstance(matrix[0], list):
         raise RuntimeError('invalid matrix')
 
     rows, cols = len(matrix), len(matrix[0])
     start = 0
-
-    while rows > start * 2 and cols > start * 2:
+    res = []
+    while rows > start * 2 and cols > start * 2:  # 每次循环的必要条件是左上角坐标相乘小于矩阵边长
 
         for col in range(start, cols - start):
-            print(matrix[start][col], end=" ")
+            res.append(matrix[start][col])
         if start + 1 < rows:
             for row in range(start + 1, rows - start):
-                print(matrix[row][col], end=" ")
+                res.append(matrix[row][col])
             if start + 2 < cols:
                 for col in range(cols - 2 - start, start - 1, -1):
-                    print(matrix[row][col], end=" ")
+                    res.append(matrix[row][col])
                 if start + 2 < rows:
                     for row in range(rows - 2 - start, start, -1):
-                        print(matrix[row][col], end=" ")
+                        res.append(matrix[row][col])
 
         start += 1
+    return res
 
 
-class MinStack:  # 用了一个辅助栈存放最小元素
+"""
+包含min函数的栈
+    实现一个栈，其中调用min会得到栈中最小值，时间复杂度要为O(1)。
+"""
+
+
+class MinStack:
     """
-    ss = MinStack()
-    for i in [2, 5, 1, 3, 0, 7]:
-        ss.put(i)
-    print(ss.min_ele)
+    显然是要用辅助空间来存放最小值才可以在常数时间得到最小值，那么解决问题的关键在于
+如何协调这两个部分。实现方法是，每次push的时候，更新min值，pop的时候也对min处理。就
+是用了一个辅助栈存放最小元素
+
+    >>> ss = MinStack()
+    >>> for i in [2, 5, 1, 3, 0, 7]: ss.put(i)
+    >>> ss.min_ele
+    0
+
     """
 
     def __init__(self):
@@ -494,8 +515,7 @@ def permutations_chr(lst):  # 直接用内置的排列生成器
     return list(permutations(lst))
 
 
-def greatest_sum_of_subarry(
-        num_lst):  # 动态规划，这里的判断不是取不取当前这个，而是要不要之前那些。如果之前那些为负数，则从现在重新开始（因为会让和比现在这个数还要小，跟我们想要的最大和不符），否则就叠加之前的。这里又要维持一个最大值的变量，因为最大值不一定出现在最后。
+def greatest_sum_of_subarry(num_lst):  # 动态规划，这里的判断不是取不取当前这个，而是要不要之前那些。如果之前那些为负数，则从现在重新开始（因为会让和比现在这个数还要小，跟我们想要的最大和不符），否则就叠加之前的。这里又要维持一个最大值的变量，因为最大值不一定出现在最后。
     """
     print(greatest_sum_of_subarry([1, -2, 3, 10, -4, 7, 2, -5]))
     """
