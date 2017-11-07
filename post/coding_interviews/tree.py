@@ -184,13 +184,25 @@ def is_symmetrical_tree(root):
     return pos_seq == rev_seq
 
 
-def print_tree_row_by_row(node):  # 用两个变量维持当行与下行的结点数，初始化时，第一行肯定是只有一个
+"""
+从上到下打印二叉树
+    从上到下按层打印二叉树，同一层的节点按左到右的顺序，每一层打印到一行。
+"""
+
+
+def print_tree_row_by_row(node):
+    """
+    这是宽度遍历的变种，需要利用队列来辅助储存。
+    难点在于如何分行，这里维护两个变量，一个变量是当前行仍需打印的节点数，一个变量是下一行需要打印的节点数。
+    主循环就是宽度遍历，然后通过当前行这个变量来决定是否输出换行。
+    :param node: 二叉树的根节点
+    :return: None
+    """
     if node is None:
         raise RuntimeError
 
     _queue = Queue()
-    next_level = 0
-    to_be_printed = 1
+    next_level, to_be_printed = 0, 1
     _queue.put(node)
     while not _queue.empty():
         _node = _queue.get()
@@ -204,7 +216,7 @@ def print_tree_row_by_row(node):  # 用两个变量维持当行与下行的结�
             _queue.put(_node.right)
             next_level += 1
 
-        if to_be_printed == 0:
+        if to_be_printed == 0:  # 打印完当行的就换行，然后更新两个变量的值
             print()
             to_be_printed, next_level = next_level, 0
 
@@ -237,21 +249,33 @@ def print_tree_by_z(node):  # 用两个栈来分别存放奇数行和偶数行�
             next = 1 - next
 
 
-def conclude_postorder_seq(postorder_seq):  # 就是利用二叉数的特征，结点的左边都比右边小
+"""
+二叉搜索树的后序遍历序列
+    输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果
+"""
+
+
+def conclude_postorder_seq(postorder_seq):
     """
-    print(conclude_postorder_seq([5, 7, 6, 9, 11, 10, 8]))
+    就是利用二叉搜索树的特征，结点的左边都比右边小。
+    递归去分析左右子树
+    :param postorder_seq: 一个数组
+    :return: bool值
+
+    >>> conclude_postorder_seq([5, 7, 6, 9, 11, 10, 8])
+    True
     """
     if len(postorder_seq) < 2:
         return True
 
     def conclude_core(seq):
-        _root = seq[-1]
+        _root = seq[-1]  # 根节点必然在最后
         for i in range(len(seq)):
-            if seq[i] > _root:
+            if seq[i] > _root:  # 找到左右子树的分界点
                 break
 
         for j in range(i, len(seq)):
-            if seq[j] < _root:
+            if seq[j] < _root:  # 若右边子树不符合规律则直接说明False
                 return False
 
         left = True
@@ -265,13 +289,28 @@ def conclude_postorder_seq(postorder_seq):  # 就是利用二叉数的特征，�
     return conclude_core(postorder_seq)
 
 
+"""
+二叉树中和为某一值的路径
+    输入一棵二叉树和一个整数，打印出二叉树中节点值的和为输入整数的所有路径。路径要求为从根
+节点到叶节点所经过的节点。
+"""
+
+
 def find_path_in_tree(node, num):
     """
-    r = BinTreeNode(10, BinTreeNode(5, BinTreeNode(4), BinTreeNode(7)), BinTreeNode(12))
-    find_path_in_tree(r, 23)
+    也是回溯法的一种应用。
+    :param node: 二叉树的根节点
+    :param num: 某整数
+    :return: 找到的路径或者 False
+
+    >>> r = BinTreeNode(10, BinTreeNode(5, BinTreeNode(4), BinTreeNode(7)), BinTreeNode(12))
+    >>> find_path_in_tree(r, 22)
+    [[10, 12], [10, 5, 7]]
+
     """
     if node is None:
         raise RuntimeError
+    res = []
     stack = LifoQueue()
     stack.put((node, node.data, [node]))
     flag = False
@@ -280,7 +319,7 @@ def find_path_in_tree(node, num):
         if _node.left is None and _node.right is None:
             if _sum == num:
                 flag = True
-                print('find one paht', _path)
+                res.append(_path)
             continue
         if _node.left is not None:
             _new_path = list(_path)
@@ -291,7 +330,13 @@ def find_path_in_tree(node, num):
             _new_path.append(_node.right)
             stack.put((_node.right, _sum + _node.right.data, _new_path))
     if not flag:
-        print('not found')
+        return False
+    return res
+
+
+"""
+序列化二叉树
+"""
 
 
 def serialize_tree(node):  # 要模拟流输入

@@ -410,17 +410,24 @@ def merge_two_sorted_linked_list(a, b):  # TODO 合并同一链表
     return dummy.next
 
 
-# 注意分析复杂度
-def clone_complex_linked_list(head):  # 分三步走: 1在每个结点后面复制出副本，2根据原来的指向，复制原来指向的next就等于复制了原来的关系，3将链表拆分
-    def clone(_head):
-        """
-        a = product_linked_list([i for i in range(10) if i % 2])
-            h = clone(a)
-            print_linked_list(h)
-            p, n = split_duplicate(h)
-            print_linked_list(p)
-            print_linked_list(n)
-        """
+"""
+复杂链表的复制
+    在复杂链表中，每个节点除了有一个指向下一节点的指针，还有一个指向其他节点或者None的
+指针。
+"""
+
+
+def clone_complex_linked_list(head):
+    """
+    要注意复杂度。
+    最简单的当然是先普通复制一边，然后再逐个复制第二个指针，这个的复杂度去到O(n^2)。
+    然后是用哈希表来存储第二个指针指向的节点，然后在一次复制完成，空间和时间复杂度均为O(n)。
+    巧妙的解法为：1在每个结点后面复制出副本，2根据原来的指向，复制原来指向的next就等于复制
+了原来的关系，3将这个链表拆分
+    :param head: 链表头部
+    :return: 复制后的链表头部
+    """
+    def clone(_head):  # 在每个节点后面复制出该节点的副本
         dummy = ListNode(None)
         curr = dummy
         curr.next = _head
@@ -432,7 +439,7 @@ def clone_complex_linked_list(head):  # 分三步走: 1在每个结点后面复�
             curr = nextp
         return dummy.next
 
-    def copy_complex(_head):
+    def copy_complex(_head):  # 复制第二个指针
         dummy = ListNode(None)
         curr = dummy
         curr.next = _head
@@ -443,7 +450,7 @@ def clone_complex_linked_list(head):  # 分三步走: 1在每个结点后面复�
             curr = curr.next.next
         return dummy.next
 
-    def split_duplicate(_head):
+    def split_duplicate(_head):  # 拆分掉链表
         dummy = ListNode(None)
         clone_head = ListNode(None)  # 这里不能用连等
 
@@ -452,7 +459,6 @@ def clone_complex_linked_list(head):  # 分三步走: 1在每个结点后面复�
 
         curr.next = _head
         curr = curr.next
-        print('head', id(curr))
         while curr is not None:
             clone_curr.next = curr.next
             clone_curr = clone_curr.next
@@ -461,6 +467,14 @@ def clone_complex_linked_list(head):  # 分三步走: 1在每个结点后面复�
             curr = curr.next
 
         return dummy.next, clone_head.next
+
+    return split_duplicate(copy_complex(clone(head)))[-1]
+
+
+"""
+二叉搜索树与双向链表
+    输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。
+"""
 
 
 def transform_tree_to_bothway_linked_list(node):  # 这题不理解。用辅助空间会简单很多，求出中序，然后利用中序来构建双向链表就可以了。

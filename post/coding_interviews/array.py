@@ -342,6 +342,129 @@ def sort_odd_and_even(num_lst):
     return lst
 
 
+"""
+数组中出现次数超过一半的数字
+    数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。
+"""
+
+
+def find_more_than_half_num(num_lst):
+    """
+    最简单的但是直接排序，然后中间那个元素就是所求。
+    利用上面这个结论，就可以将问题转换为求第k个元素（求中间那个元素）。
+    利用快排的划分。
+    :param num_lst:
+    :return:
+
+    >>> find_more_than_half_num([1, 2, 3, 2, 2, 2, 5, 4, 2])
+    2
+    """
+    if num_lst is None or len(num_lst) == 0:
+        return None
+    if len(num_lst) <= 2:
+        return num_lst[0]
+
+    def partition(lst, s, e):
+        pivot = lst[s]
+        i = s
+        for j in range(s + 1, end + 1):
+            if lst[j] < pivot:
+                i += 1
+                lst[i], lst[j] = lst[j], lst[i]
+
+        lst[s], lst[i] = lst[i], lst[s]
+        return i
+
+    start, end = 0, len(num_lst) - 1
+    mid = (start + end) >> 1
+    index = partition(num_lst, start, end)
+    while index != mid:
+        if index > mid:
+            end = index - 1
+            index = partition(num_lst, start, end)
+        else:
+            start = index + 1
+            index = partition(num_lst, start, end)
+    return num_lst[index]
+
+
+def find_more_than_half_num1(num_lst):
+    """
+    那个数的出现次数，至少比其他所有数的总出现次数多一次，所以遍历一次就能找出来。
+    :param num_lst:
+    :return:
+
+    >>> find_more_than_half_num1([1, 2, 3, 2, 2, 2, 5, 4, 2])
+    2
+
+    """
+    that_num, times = None, 0
+    for i in num_lst:
+        if times == 0:
+            that_num = i
+        elif i == that_num:
+            times += 1
+        else:
+            times -= 1
+    return that_num
+
+
+"""
+最小的k个数
+    输入n个整数，找出其中最小的k个数。
+"""
+
+
+def find_min_k_num(num_lst, k):
+    """
+    利用快排的思想，将问题转换成找第k个数就好了。
+    :param num_lst:
+    :param k:
+    :return:
+    """
+    if len(num_lst) <= k:
+        return num_lst
+
+    from random import randint  # 引入随机数会更好的
+
+    def partition(lst, s, e):
+        if s >= e:
+            return s
+        _index = randint(s, e)
+        lst[s], lst[_index] = lst[_index], lst[s]
+        i = s
+        for j in range(s + 1, e + 1):  # 注意这个范围，end要加1
+            if lst[j] < lst[s]:
+                i += 1  # 要先加1，因为要保证不会移动轴元素
+                lst[i], lst[j] = lst[j], lst[i]
+        lst[s], lst[i] = lst[i], lst[s]
+        return i
+
+    start, end = 0, len(num_lst) - 1
+    index = partition(num_lst, start, end)
+    while k != index:
+        if index > k:
+            end = index - 1
+            index = partition(num_lst, start, end)
+        else:
+            start = index + 1
+            index = partition(num_lst, start, end)
+    return num_lst[: k]
+
+
+def find_min_k_num1(num_lst, k):
+    """
+    用堆来存放最小的k项。
+    :param num_lst:
+    :param k:
+    :return:
+
+    >>> find_min_k_num1([i for i in range(10)], 4)
+    """
+    from heapq import nsmallest  # 内置的求最小k项函数
+    return nsmallest(k, num_lst)
+
+
 def find_min_in_rotate_111(lst):  # 普通情况，0偏移情况，有重复元素情况
     if len(lst) > 1:
         start, end = 0, len(lst) - 1

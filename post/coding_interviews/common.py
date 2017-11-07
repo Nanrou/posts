@@ -489,37 +489,62 @@ class MinStack:
         return self.min_stack.queue[-1]
 
 
-def push_seq_and_pop_seq(push_seq, pop_seq):  # 用一个栈来模拟出入栈，一直比较栈顶元素是否能对应上弹出元素就可以了
+"""
+栈的压入、弹出序列
+    输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否
+为该栈的弹出顺序。
+"""
+
+
+def push_seq_and_pop_seq(push_seq, pop_seq):
+    """
+    用一个栈来模拟出入栈行为，一直比较栈顶元素是否能对应上弹出元素就可以了
+    :param push_seq: 压入顺序
+    :param pop_seq: 弹出顺序
+    :return: bool值表示能否对应上
+
+    >>> push_seq_and_pop_seq([1, 2, 3, 4, 5], [4, 5, 3, 2, 1])
+    True
+    >>> push_seq_and_pop_seq([1, 2, 3, 4, 5], [4, 3, 5, 1, 2])
+    False
+    """
     if len(push_seq) == 0 or len(push_seq) != len(pop_seq):
         raise RuntimeError
 
     stack = LifoQueue()
     push_index = pop_index = 0
-    while push_index <= len(push_seq):
-        if not stack.empty() and stack.queue[-1] == pop_seq[pop_index]:
-            pop_index += 1
-            stack.get()
-            if push_index == pop_index == len(push_seq):
-                return True
-            continue
+    while push_index < len(push_seq):
         stack.put(push_seq[push_index])
         push_index += 1
+        while not stack.empty() and stack.queue[-1] == pop_seq[pop_index]:  # 比较栈顶元素和当前弹出的元素
+            stack.get()
+            pop_index += 1
+            if push_index == pop_index == len(push_seq):
+                return True
     return False
+
+
+"""
+字符串的排列
+    输入一个字符串，打印出该字符串中字符的所有排列。
+"""
 
 
 def permutations_chr(lst):  # 直接用内置的排列生成器
     """
-    print(push_seq_and_pop_seq([1, 2, 3, 4, 5], [4, 5, 3, 2, 1]))
+    就是求排列，用内置的排列函数就可以了。
+    :param lst: 字符串
+    :return: 生成的排列
     """
     from itertools import permutations
     return list(permutations(lst))
 
 
-def greatest_sum_of_subarry(num_lst):  # 动态规划，这里的判断不是取不取当前这个，而是要不要之前那些。如果之前那些为负数，则从现在重新开始（因为会让和比现在这个数还要小，跟我们想要的最大和不符），否则就叠加之前的。这里又要维持一个最大值的变量，因为最大值不一定出现在最后。
+def greatest_sum_of_subarray(num_lst):  # 动态规划，这里的判断不是取不取当前这个，而是要不要之前那些。如果之前那些为负数，则从现在重新开始（因为会让和比现在这个数还要小，跟我们想要的最大和不符），否则就叠加之前的。这里又要维持一个最大值的变量，因为最大值不一定出现在最后。
     """
-    print(greatest_sum_of_subarry([1, -2, 3, 10, -4, 7, 2, -5]))
+    print(greatest_sum_of_subarray([1, -2, 3, 10, -4, 7, 2, -5]))
     """
-    curr = sum = 0
+    curr = sum_ = 0
     for i in range(len(num_lst)):
         if i == 0:  # 初始情况
             curr = num_lst[i]
@@ -528,8 +553,8 @@ def greatest_sum_of_subarry(num_lst):  # 动态规划，这里的判断不是取
             curr = num_lst[i]
         else:
             curr += num_lst[i]
-            sum = max(curr, sum)
-    return sum
+            sum_ = max(curr, sum_)
+    return sum_
 
 
 def count_k_between_n(n, k=1):  # 十进制，也就是说每十个数，k就出现一次。对于个位来讲，有多少组十，就有多少个k，然后再看余数是否小于k，否则就+1。后面都是如此循环
@@ -579,9 +604,11 @@ def find_min_number_combine(
     print(find_min_number_combine([3, 32, 321]))
     """
     if num_lst is None or len(num_lst) == 0: return None
-    if len(num_lst) == 1: return num_lst[0]
+    if len(num_lst) == 1:
+        return num_lst[0]
 
     from random import randint
+
     def sort_core(lst, s, e):
         if s >= e:
             return
