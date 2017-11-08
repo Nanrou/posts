@@ -348,16 +348,28 @@ def serialize_tree(node):  # 要模拟流输入
     serialize_tree(node.right)
 
 
+"""
+二叉搜索树的第k大节点
+    给定一棵二叉搜索树，找出其中第k大的节点。
+"""
+
+
 def find_kth_in_tree(node, k):
     """
-    from basic_operation import sorted_bin_tree_root as a_root
-    find_kth_in_tree(a_root, 0)
+    做一个中序遍历，第k个元素就是所求了。
+    :param node: 二叉搜索树的根节点
+    :param k: 序号
+    :return: 第k大的节点
+    >>> find_kth_in_tree(root_node, 1)
+    4
     """
-    if node is None: return None
+    if node is None:
+        return None
     inorde = []
 
     def inorder_recursion(node):
-        if node is None: return
+        if node is None:
+            return
         inorder_recursion(node.left)
         inorde.append(node.data)
         inorder_recursion(node.right)
@@ -369,7 +381,21 @@ def find_kth_in_tree(node, k):
         return None
 
 
-def depth_of_tree(node):  # 第一反应想到的是通过遍历去找到最深的值，但是实现起来有点复杂，用递归会简洁很多。
+"""
+二叉树的深度
+    输入一棵二叉树的根节点，求该树的深度。从根节点到叶节点依次经过的节点形成
+树的一条路径，最长路径的长度为树的深度。
+"""
+
+
+def depth_of_tree(node):
+    """
+    直接用递归去解决。
+    :param node: 二叉树的根节点
+    :return: 树的深度
+    >>> depth_of_tree(root_node)
+    3
+    """
     if node is None:  # 空的时候深度为0
         return 0
     left = depth_of_tree(node.left)
@@ -377,14 +403,20 @@ def depth_of_tree(node):  # 第一反应想到的是通过遍历去找到最深�
     return max(left, right) + 1  # 每一层都会使深度加一,然后最大值就是取在这层之前的最大值
 
 
-def is_balanced_tree(node):  # 也是后序遍历，在递归的时候传递flag和深度  
+def is_balanced_tree(node):
     """
-    from basic_operation import sorted_bin_tree_root as a_root
-    print(is_balanced_tree(a_root))
+    问题的关键在于要去比较左右子树的深度。
+    而后序遍历正是先处理左右子树的逻辑，所以我们可以采用这种遍历方法，在递归的时候
+传递深度。
+    :param node: 二叉树的根节点
+    :return: bool值
+    >>> is_balanced_tree(root_node)
+    True
     """
 
     def is_balanced_tree_core(node):
-        if node is None: return True, 0
+        if node is None:
+            return True, 0
         flag1, left = is_balanced_tree_core(node.left)
         flag2, right = is_balanced_tree_core(node.right)
         if flag1 and flag2 and abs(left - right) < 2:

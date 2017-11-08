@@ -465,30 +465,213 @@ def find_min_k_num1(num_lst, k):
     return nsmallest(k, num_lst)
 
 
-def find_min_in_rotate_111(lst):  # 普通情况，0偏移情况，有重复元素情况
-    if len(lst) > 1:
-        start, end = 0, len(lst) - 1
-        while lst[start] >= lst[end]:
-            if end - start == 1:
-                return lst[end]
-            mid = (start + end) // 2
-            if lst[mid] == lst[start]:
-                break
-            elif lst[mid] > lst[start]:
-                start = mid
-            else:
-                end = mid
+"""
+在排序数组中查找数字
+    统计一个数字在排序数组中出现的次数。
+"""
+
+
+def count_number(lst, k):
+    """
+    直接用内置的。
+    可以尝试用二分来找到左右的边界来得到最后的结果。
+    >>> count_number([1, 2, 3, 3, 3, 3, 4, 5], 3)
+    4
+    """
+    return lst.count(k)
+
+
+"""
+0~n-1中缺失的数字
+    一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0~n-1内。
+有且只有一个数字不在该数组中，求这个数字。
+"""
+
+
+def find_miss_ele(lst):
+    """
+    可以采用求和，求0~n-1的和，与数组的和的差值就是所求了。
+    或者将问题转换成，求第一个 值与下标不相等的元素。
+    :param lst: 数组
+    :return: 缺失的元素
+    >>> find_miss_ele([1, 2, 3, 4, 5, 6])
+    0
+    >>> find_miss_ele([0, 1, 2, 3, 5, 6])
+    4
+    >>> find_miss_ele([0, 1, 2, 3, 4, 5])
+    6
+    """
+    start, end = 0, len(lst) - 1
+
+    while start <= end:
+        mid = (start + end) >> 1
+        if mid == lst[mid]:  # 边界必定是在相等元素的右边
+            start = mid + 1
         else:
-            return lst[start]
+            if mid - 1 == lst[mid - 1] or mid == 0:
+                return mid
+            end = mid - 1
+    return start
 
-        _min = 0
-        for i in lst:
-            _min = min(_min, i)
-        return _min
-    else:
-        return lst
 
-        
+"""
+数组中数值与下标相等的元素
+    假设一个单调递增的数组里的每个元素都是整数并且唯一，请找出数组中任意一个
+数值等于其下标的元素。
+"""
+
+
+def find_ele_equal_its_sub(lst):
+    """
+    在解决有序的相关问题时，应优先想到二分法。
+    由于数组是单调递增的，所以可以用二分去找。
+    :param lst: 数组
+    :return: 数值与下标相等的元素
+    >>> find_ele_equal_its_sub([-1, 1, 3, 4, 5, 6])
+    1
+    """
+    start, end = 0, len(lst) - 1
+    while start <= end:  # 二分是要有等号的
+        mid = (start + end) >> 1
+        if mid == lst[mid]:
+            return mid
+        if lst[mid] > mid:
+            end = mid - 1
+        else:
+            start = mid + 1
+    return None
+
+
+"""
+数组中只出现一次的两个数字
+    一个整数数组里两个数字以外，其他数字都出现了两次，请找出这两个数字。
+"""
+
+
+def find_two_num_appear_once(num_lst):  # 考察位运算，利用了一个数异或本身为0的性质
+    """
+    位运算，两个相同的数异或会得到0。利用这个特点。
+    对整个数组做异或运算，最后一定会得到一个不为0的数。利用这个数将数组划分成两部分，
+然后分别对各部分又做一次异或，就可以得到结果了。
+    :param num_lst: 数组
+    :return: 那两个数字
+    >>> find_two_num_appear_once([2, 4, 3, 6, 3, 2, 5, 5])
+    (6, 4)
+    """
+    assert len(num_lst) > 3
+    from functools import reduce
+    tmp, one = reduce(lambda x, y: x ^ y, num_lst), 1  # 因为有两个数不同，所以最终得出来的数肯定不为1
+    while not tmp & one:
+        one <<= 1  # tmp的二进制表示中，必然最少有一个1，现在去找那一个1的位置
+    a = reduce(lambda x, y: x ^ y, [num for num in num_lst if num & one])  # 所以可以根据上面那个数将数组分为两个部分，再分别异或就会剩下那个单独的数了
+    b = reduce(lambda x, y: x ^ y, [num for num in num_lst if not num & one])
+    return a, b
+
+
+"""
+数组中唯一只出现一次的数字
+    在一个数组中除一个数字只出现一次以外，其他数字都出现了三次，找到那个只出现一次的数字。
+"""
+
+
+def find_one_num_appear_once(num_lst):
+    """
+    往位运算方面去靠。换成二进制表示，在每一位上面相加，最后再对所有位整除3，如果某位不能
+整除3，则说明它是所求的其中一位。
+    :param num_lst: 数组
+    :return: 所求那个数
+
+    >>> find_one_num_appear_once([1, 2, 1, 1])
+    2
+    """
+    assert len(num_lst) > 3
+    bit_lst = [0] * 32
+    for num in num_lst:
+        num_in_bit = bin(num).lstrip('0b').zfill(32)
+        for index, char in enumerate(num_in_bit):
+            bit_lst[index] += int(char)
+    for i in range(len(bit_lst)):
+        bit_lst[i] %= 3
+    return int(''.join([str(bit) for bit in bit_lst]), 2)
+
+
+"""
+和为s的两个数字
+    输入一个递增排序的数组和一个数字s，在数组中查找两个数，使它们的和正好是s。
+"""
+
+
+def find_two_num_with_sum(num_lst, k):
+    """
+    直接用双指针，一个指头一个指尾就可以了。因为是有序的。
+    :param num_lst: 有序的数组
+    :param k: 目标和
+    :return: 达到要求的两个元素
+
+    >>> find_two_num_with_sum([1, 2, 4, 7, 11, 15], 15)
+    (4, 11)
+    """
+    assert len(num_lst) > 2
+    p1, p2 = 0, len(num_lst) - 1
+    while p1 < p2:
+        if num_lst[p1] + num_lst[p2] == k:
+            return num_lst[p1], num_lst[p2]
+        elif num_lst[p1] + num_lst[p2] < k:
+            p1 += 1
+        else:
+            p2 -= 1
+    return None
+
+
+"""
+和为s的连续正数序列
+    输入一个正数s，打印出所有和为s的连续正整数序列。
+"""
+
+
+def find_seq_with_sum(k):
+    """
+    还是用双指针，不过这次是用双指针来包住序列的。
+    :param k: 某正整数
+    :return: 和为k的连续序列
+    >>> find_seq_with_sum(15)
+    [[1, 2, 3, 4, 5], [4, 5, 6], [7, 8]]
+    """
+    num_lst = [i for i in range(1, k // 2 + 2)]  # 序列的取值范围
+    p1, p2 = 0, 1
+    res = []
+    while num_lst[p1] < k / 2 and p2 < len(num_lst):
+        curr_sum = sum(num_lst[p1: p2 + 1])
+        if curr_sum == k:
+            res.append(num_lst[p1: p2 + 1])
+            p2 += 1
+        if curr_sum < k:
+            p2 += 1
+        else:
+            p1 += 1
+    return res
+
+
+"""
+滑动窗口的最大值
+    给定一个数组和滑动窗口的大小，请找出所有滑动窗口里的最大值。
+"""
+
+
+def max_in_window(num_lst, width):
+    """
+    用最直观的方法来做，就是直接比较每个窗口。
+    >>> max_in_window([2, 3, 4, 2, 6, 2, 5, 1], 3)
+    [4, 4, 6, 6, 6, 5]
+    """
+    if width > 0 and len(num_lst) < width:
+        raise RuntimeError
+    res_lst = []
+    for i in range(len(num_lst) - width + 1):
+        res_lst.append(max(num_lst[i: i + width]))
+    return res_lst
+
+
 if __name__ == '__main__':
     import doctest
 

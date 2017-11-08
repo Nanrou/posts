@@ -501,13 +501,21 @@ def transform_tree_to_bothway_linked_list(node):  # 这题不理解。用辅助�
     return dummy.next.next
 
 
-def find_first_common_node(node1, node2):  # 利用了两个辅助栈来分别记录两个链表，然后从后往回找
+"""
+两个链表的第一个公共节点
+    输入两个链表，找出它们的第一个公共节点。
+"""
+
+
+def find_first_common_node(node1, node2):
     """
-    d1, d2 = product_common_node_linked_list()
-    print_linked_list(d1)
-    print_linked_list(d2)
-    d = find_first_common_node(d1, d2)
-    print_linked_list(d)
+    遍历两个链表，将它们分别存到两个栈，然后通过比较两个栈的弹出元素来得到结果。
+    :param node1: 一链表头部
+    :param node2: 另一链表头部
+    :return: 第一个共同节点
+    >>> d1, d2 = product_common_node_linked_list()
+    >>> find_first_common_node(d1, d2)
+    0
     """
     if node1 is None or node2 is None:
         return None
@@ -529,13 +537,17 @@ def find_first_common_node(node1, node2):  # 利用了两个辅助栈来分别�
         pre1, pre2 = _n1, _n2
 
 
-def find_first_common_node1(node1, node2):  # 对两个链表进行遍历，找到各自的长度，较长的先出发，往前走n步，n为长度之差，然后较短的也出发，遇到相同的就是公共结点
+def find_first_common_node1(node1, node2):
     """
-    d1, d2 = product_common_node_linked_list()
-    print_linked_list(d1)
-    print_linked_list(d2)
-    d = find_first_common_node1(d1, d2)
-    print_linked_list(d)
+    双指针
+    对两个链表进行遍历，找到各自的长度，较长的先出发，往前走n步，
+n为长度之差，然后较短的也出发，遇到相同的就是公共结点。
+    :param node1: 一链表头部
+    :param node2: 另一链表头部
+    :return: 第一个共同节点
+    >>> d1, d2 = product_common_node_linked_list()
+    >>> find_first_common_node1(d1, d2)
+    0
     """
 
     curr1, curr2 = node1, node2
@@ -566,10 +578,22 @@ def find_first_common_node1(node1, node2):  # 对两个链表进行遍历，找�
         curr1, curr2 = curr1.next, curr2.next
 
 
+"""
+圆圈中最后剩下的数字
+    0~n-1这n个数字排成一个圆，从0开始，每次从圈中删除第m个数字，求出圈中最后一个数字。
+"""
+
+
 def last_remaining(node, k):
     """
-    nn = product_loop_linked_list([0, 1, 2, 3, 4], 0)
-    last_remaining(nn, 3)
+    约瑟夫环。
+    维持一个计数变量，每当计数到达k，则删除那个节点，并重置计数。
+    :param node: 环链表中为0的节点
+    :param k: 每次都删除第k个节点
+    :return: 最后剩下的那个节点
+    >>> nn = product_loop_linked_list([0, 1, 2, 3, 4], 0)
+    >>> last_remaining(nn, 3)
+    3
     """
     curr = ListNode(None)
     curr.next = node
@@ -582,7 +606,7 @@ def last_remaining(node, k):
             curr.next = curr.next.next
             i = 1
     else:
-        print(curr)
+        return curr
 
 
 if __name__ == '__main__':
