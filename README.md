@@ -18,6 +18,7 @@
 * pytest入门指北之fixtures
 * 关于Gevent的入门指北
 * 关于supervisor的入门指北
+* php配置之入门指北
 
 ## 兴趣使然的翻译
 * Asyncio中Lock部分的翻译
