@@ -49,6 +49,8 @@
 * python日常碎碎念--PIL
 * python日常碎碎念--获取命令行参数
 * 个人小玩具：协程爬虫介绍&去重判断
+* concurrent.future的一些笔记
+* 稍微看一下异步服务器的实现
 
 ## linux相关
 * linux的日常碎碎念--python&vim&crontab
